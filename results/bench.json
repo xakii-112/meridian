@@ -1,0 +1,32 @@
+{
+  "cpu": "AMD Ryzen 7 7435HS",
+  "tsc_ghz": 3.0941,
+  "timer_overhead_cycles": 31,
+  "compiler": "clang 23.1.3 (https://github.com/llvm/llvm-project.git 0d261d1ca552c95a8f007e061c787ac7132fbcbc)",
+  "warmup_ops": 500000,
+  "measured_ops": 5000000,
+  "latency": {
+    "engine": {
+      "heap_allocations_in_timed_region": 0,
+      "avg_resting_orders": 10000,
+      "trades": 1940963,
+      "all": {"count": 5000000, "mean_ns": 41.1, "p50_ns": 30.2, "p90_ns": 70.1, "p99_ns": 169.4, "p99_9_ns": 452.5, "p99_99_ns": 643.8, "max_ns": 36529.5},
+      "add_passive": {"count": 2500124, "mean_ns": 40.7, "p50_ns": 30.2, "p90_ns": 70.1, "p99_ns": 161.0, "p99_9_ns": 421.4, "p99_99_ns": 612.8, "max_ns": 34746.1},
+      "add_marketable": {"count": 249537, "mean_ns": 51.8, "p50_ns": 40.2, "p90_ns": 89.8, "p99_ns": 210.7, "p99_9_ns": 462.8, "p99_99_ns": 718.8, "max_ns": 12503.8},
+      "cancel": {"count": 827891, "mean_ns": 30.8, "p50_ns": 20.0, "p90_ns": 40.2, "p99_ns": 150.6, "p99_9_ns": 452.5, "p99_99_ns": 623.1, "max_ns": 36529.5},
+      "replace": {"count": 1422448, "mean_ns": 45.8, "p50_ns": 40.2, "p90_ns": 60.4, "p99_ns": 179.7, "p99_9_ns": 483.5, "p99_99_ns": 708.4, "max_ns": 12994.7}
+    },
+    "engine_with_risk": {
+      "heap_allocations_in_timed_region": 0,
+      "avg_resting_orders": 10000,
+      "trades": 1940963,
+      "all": {"count": 5000000, "mean_ns": 51.7, "p50_ns": 40.2, "p90_ns": 80.5, "p99_ns": 179.7, "p99_9_ns": 462.8, "p99_99_ns": 649.0, "max_ns": 34315.3},
+      "add_passive": {"count": 2500124, "mean_ns": 51.6, "p50_ns": 40.2, "p90_ns": 80.5, "p99_ns": 169.4, "p99_9_ns": 390.4, "p99_99_ns": 623.1, "max_ns": 34315.3},
+      "add_marketable": {"count": 249537, "mean_ns": 65.2, "p50_ns": 50.1, "p90_ns": 110.5, "p99_ns": 231.4, "p99_9_ns": 452.5, "p99_99_ns": 698.1, "max_ns": 14026.7},
+      "cancel": {"count": 827891, "mean_ns": 34.7, "p50_ns": 30.2, "p90_ns": 40.2, "p99_ns": 161.0, "p99_9_ns": 473.2, "p99_99_ns": 677.4, "max_ns": 16220.9},
+      "replace": {"count": 1422448, "mean_ns": 59.3, "p50_ns": 50.1, "p90_ns": 80.5, "p99_ns": 190.0, "p99_9_ns": 488.7, "p99_99_ns": 649.0, "max_ns": 33453.6}
+    }
+  },
+  "throughput": {"commands": 5500000, "best_msgs_per_sec": 25661208, "deterministic_replay": true},
+  "tape_hash": "0x856e25ee8b1bc758"
+}

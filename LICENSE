@@ -1,0 +1,54 @@
+Copyright (c) 2026 Kagan Elifoglu. All rights reserved.
+Telif hakkı (c) 2026 Kagan Elifoglu. Tüm hakları saklıdır.
+
+================================================================================
+ENGLISH
+================================================================================
+
+This repository is published for viewing and evaluation only. It is NOT open
+source, and no license is granted.
+
+Without the prior written permission of the copyright holder you may not use,
+copy, modify, merge, publish, distribute, sublicense or sell this software or
+its documentation, in whole or in part, for any purpose.
+
+Nothing in this notice limits the rights that the GitHub Terms of Service give
+to GitHub users for content hosted on GitHub (viewing the repository and
+forking it on GitHub).
+
+Third-party packages named in research/pyproject.toml and engine/CMakeLists.txt are not part of this work and
+remain under their own licenses.
+
+To ask for permission, open an issue in this repository.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM, OUT OF
+OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
+
+================================================================================
+TÜRKÇE
+================================================================================
+
+Bu depo yalnızca incelenmek ve değerlendirilmek üzere yayımlanmıştır. Açık
+kaynak DEĞİLDİR ve hiçbir lisans verilmemektedir.
+
+Telif hakkı sahibinin önceden verilmiş yazılı izni olmadan bu yazılım ve
+belgeleri, tamamen ya da kısmen, hiçbir amaçla kullanılamaz, kopyalanamaz,
+değiştirilemez, birleştirilemez, yayımlanamaz, dağıtılamaz, alt lisanslanamaz
+ve satılamaz.
+
+Bu bildirim, GitHub Hizmet Şartları'nın GitHub'da barındırılan içerik için
+GitHub kullanıcılarına tanıdığı hakları (depoyu görüntüleme ve GitHub üzerinde
+çatallama) kısıtlamaz.
+
+research/pyproject.toml and engine/CMakeLists.txt içinde adı geçen üçüncü taraf paketler bu eserin parçası
+değildir ve kendi lisanslarına tabidir.
+
+İzin istemek için bu depoda bir "issue" açın.
+
+YAZILIM "OLDUĞU GİBİ" SUNULMAKTADIR; SATILABİLİRLİK, BELİRLİ BİR AMACA UYGUNLUK
+VE HAK İHLALİ BULUNMAMASI DAHİL, AÇIK YA DA ÖRTÜLÜ HİÇBİR GARANTİ VERİLMEZ.
+TELİF HAKKI SAHİBİ, YAZILIMDAN YA DA KULLANIMINDAN DOĞAN HİÇBİR TALEP, ZARAR YA
+DA BAŞKA YÜKÜMLÜLÜKTEN SORUMLU TUTULAMAZ.

@@ -1,0 +1,9 @@
+engine/build*/
+__pycache__/
+*.pyc
+.pytest_cache/
+results/sim_tape.mwp
+results/quick/
+results/real_dev/
+data/
+results/paper/paper_*Z/

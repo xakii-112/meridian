@@ -1,0 +1,1314 @@
+<meta charset="utf-8">
+<title>Meridian</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one 1120px spec-sheet column. Header + measured-results strip, then the live market as the
+   centrepiece, then Engine -> Research -> Verification, each with a section label rail on wide screens. */
+:root {
+  --paper: #f3f5f8;
+  --panel: #ffffff;
+  --ink: #0f1a2b;
+  --muted: #56667b;
+  --faint: #8794a6;
+  --rule: #dae1ea;
+  --rule-strong: #b7c2d1;
+  --accent: #2346d4;
+  --accent-soft: #e5eafc;
+  --bid: #0c8274;
+  --bid-soft: #d6efeb;
+  --ask: #c93e35;
+  --ask-soft: #f9e1df;
+  --good: #1b7543;
+  --bad: #b3261e;
+  --s1: #2346d4;
+  --s2: #c93e35;
+  --s3: #0c8274;
+  --s4: #a3620b;
+  --s5: #7a44c4;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0b111c; --panel: #111a29; --ink: #e5ebf4; --muted: #95a3b8; --faint: #6b788c;
+    --rule: #1f2b3f; --rule-strong: #34435c; --accent: #8098ff; --accent-soft: #1b2650;
+    --bid: #3cc4b2; --bid-soft: #12332f; --ask: #ff7b6e; --ask-soft: #3a1d1c;
+    --good: #5bcf8b; --bad: #ff8a80;
+    --s1: #8098ff; --s2: #ff7b6e; --s3: #3cc4b2; --s4: #e7b04f; --s5: #b892ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0b111c; --panel: #111a29; --ink: #e5ebf4; --muted: #95a3b8; --faint: #6b788c;
+  --rule: #1f2b3f; --rule-strong: #34435c; --accent: #8098ff; --accent-soft: #1b2650;
+  --bid: #3cc4b2; --bid-soft: #12332f; --ask: #ff7b6e; --ask-soft: #3a1d1c;
+  --good: #5bcf8b; --bad: #ff8a80;
+  --s1: #8098ff; --s2: #ff7b6e; --s3: #3cc4b2; --s4: #e7b04f; --s5: #b892ff;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(44px, 9vw, 92px); font-stretch: 125%; font-weight: 800; line-height: 0.95; letter-spacing: -0.03em; }
+h2 { font-size: clamp(24px, 3.4vw, 32px); font-stretch: 115%; font-weight: 750; line-height: 1.15; }
+h3 { font-size: 17px; font-stretch: 105%; font-weight: 700; line-height: 1.3; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--font-mono); font-size: 0.88em; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---- header ---- */
+header { padding-block: 56px 28px; display: grid; gap: 22px; }
+.lede { font-size: clamp(17px, 2.1vw, 21px); line-height: 1.45; max-width: 60ch; }
+.tagrow { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag { font-family: var(--font-mono); font-size: 12px; padding: 3px 9px; border: 1px solid var(--rule-strong); border-radius: 999px; color: var(--muted); }
+.strip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule-strong); margin-top: 8px; }
+.strip > div { padding: 14px 14px 14px 0; display: grid; gap: 2px; min-width: 0; }
+.strip > div + div { padding-left: 14px; border-left: 1px solid var(--rule); }
+.strip dt { font-size: 12px; color: var(--muted); line-height: 1.3; }
+.strip dd { margin: 0; font-family: var(--font-mono); font-size: clamp(20px, 2.6vw, 28px); font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.strip dd small { font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.strip .ok { color: var(--good); }
+
+/* ---- sections ---- */
+section { padding-block: 44px; border-top: 1px solid var(--rule); }
+.sec-head { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 24px; margin-bottom: 26px; align-items: start; }
+.sec-head .eyebrow { padding-top: 8px; }
+.sec-head > div { display: grid; gap: 10px; min-width: 0; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 18px; display: grid; gap: 10px; min-width: 0; align-content: start; }
+.card p { font-size: 14px; color: var(--muted); }
+.chart { width: 100%; min-height: 220px; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12.5px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+
+/* ---- live market ---- */
+.sim { background: var(--panel); border: 1px solid var(--rule-strong); border-radius: 8px; overflow: hidden; }
+.sim-bar { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; padding: 16px 18px; border-bottom: 1px solid var(--rule); }
+.ctl { display: grid; gap: 5px; min-width: 0; }
+.ctl label, .ctl .lbl { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 10px; }
+.ctl output { font-family: var(--font-mono); color: var(--ink); font-size: 12px; }
+.ctl input[type="range"] { width: 150px; accent-color: var(--accent); }
+.seg { display: inline-flex; border: 1px solid var(--rule-strong); border-radius: 6px; overflow: hidden; }
+.seg button { font: 500 13px var(--font-body); padding: 6px 11px; background: transparent; color: var(--ink); border: 0; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule-strong); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.btn { font: 600 13px var(--font-body); padding: 7px 12px; border-radius: 6px; border: 1px solid var(--rule-strong); background: var(--panel); color: var(--ink); cursor: pointer; }
+.btn:hover { border-color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--panel); }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.sim-body { display: grid; grid-template-columns: 250px minmax(0, 1fr); }
+.ladder { border-right: 1px solid var(--rule); padding: 10px 0; font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+.ladder .hdr, .ladder .row { display: grid; grid-template-columns: 1fr 64px 1fr; align-items: center; height: 21px; padding: 0 10px; }
+.ladder .hdr { color: var(--faint); font-size: 11px; height: 18px; }
+.ladder .row .px { text-align: center; color: var(--muted); }
+.ladder .row.fair .px { color: var(--ink); font-weight: 600; }
+.ladder .cell { position: relative; height: 15px; display: flex; align-items: center; }
+.ladder .cell.b { justify-content: flex-end; }
+.ladder .bar { position: absolute; top: 0; bottom: 0; border-radius: 2px; }
+.ladder .cell.b .bar { right: 0; background: var(--bid-soft); }
+.ladder .cell.a .bar { left: 0; background: var(--ask-soft); }
+.ladder .q { position: relative; padding: 0 5px; }
+.ladder .cell.b .q { color: var(--bid); }
+.ladder .cell.a .q { color: var(--ask); }
+.ladder .mm { position: relative; font-size: 10px; font-weight: 600; color: var(--panel); background: var(--accent); padding: 0 4px; border-radius: 3px; margin: 0 3px; }
+.plot { padding: 10px 12px 6px; display: grid; gap: 6px; min-width: 0; }
+.plot canvas { width: 100%; display: block; }
+#priceCanvas { height: 300px; }
+#invCanvas { height: 110px; }
+.tiles { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-top: 1px solid var(--rule); }
+.tiles > div { padding: 12px 14px; display: grid; gap: 1px; min-width: 0; }
+.tiles > div + div { border-left: 1px solid var(--rule); }
+.tiles span { font-size: 11.5px; color: var(--muted); }
+.tiles b { font-family: var(--font-mono); font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pos { color: var(--good); }
+.neg { color: var(--bad); }
+.sim-note { padding: 10px 18px 14px; font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--rule); }
+
+/* ---- tables ---- */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 9px 12px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--rule); }
+th { font-weight: 600; color: var(--muted); font-size: 12px; background: var(--paper); }
+td { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; font-family: var(--font-body); }
+tr:last-child td { border-bottom: 0; }
+tr.hl td { background: var(--accent-soft); }
+.sw { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; vertical-align: 0; }
+
+/* ---- architecture diagram ---- */
+.diagram { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px; }
+.diagram svg { min-width: 760px; width: 100%; display: block; }
+.diagram .box { fill: var(--paper); stroke: var(--rule-strong); }
+.diagram .box.core { fill: var(--accent-soft); stroke: var(--accent); }
+.diagram text { fill: var(--ink); font-family: var(--font-body); font-size: 13px; }
+.diagram .sub { fill: var(--muted); font-size: 11px; font-family: var(--font-mono); }
+.diagram .arrow { stroke: var(--muted); stroke-width: 1.4; fill: none; marker-end: url(#arrowhead); }
+.diagram #arrowhead path { fill: var(--muted); }
+
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.fact { border-top: 2px solid var(--ink); padding-top: 10px; display: grid; gap: 6px; align-content: start; }
+.fact b { font-family: var(--font-mono); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fact p { font-size: 14px; color: var(--muted); }
+.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.checks li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.checks .mark { font-family: var(--font-mono); font-weight: 700; color: var(--good); }
+.checks .mark.fail { color: var(--bad); }
+.checks .val { font-family: var(--font-mono); font-size: 13px; color: var(--muted); text-align: right; }
+pre.cmd { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; margin: 0; }
+pre.cmd .c { color: var(--faint); }
+footer { padding-block: 32px 64px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--muted); display: grid; gap: 8px; }
+
+/* svg chart styling */
+.ax line, .ax path { stroke: var(--rule-strong); }
+.ax text { fill: var(--muted); font-family: var(--font-mono); font-size: 11px; }
+.gridl { stroke: var(--rule); }
+.axlabel { fill: var(--muted); font-size: 11.5px; font-family: var(--font-body); }
+.zero { stroke: var(--faint); stroke-dasharray: 3 3; }
+.annot { fill: var(--ink); font-size: 11.5px; font-family: var(--font-body); }
+
+@media (max-width: 900px) {
+  .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .strip > div { padding: 12px 10px 12px 0; border-bottom: 1px solid var(--rule); }
+  .strip > div + div { padding-left: 0; border-left: 0; }
+  .strip > div:nth-child(even) { padding-left: 12px; border-left: 1px solid var(--rule); }
+  .sec-head { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .grid2, .facts { grid-template-columns: minmax(0, 1fr); }
+  .sim-body { grid-template-columns: minmax(0, 1fr); }
+  .ladder { border-right: 0; border-bottom: 1px solid var(--rule); }
+  .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tiles > div:nth-child(4) { border-left: 0; }
+  .tiles > div:nth-child(n+4) { border-top: 1px solid var(--rule); }
+}
+@media (max-width: 520px) {
+  .ctl input[type="range"] { width: 130px; }
+  header { padding-block: 36px 20px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<header class="wrap">
+  <div class="eyebrow">Electronic market-making stack · C++20 engine · Python research</div>
+  <h1>Meridian</h1>
+  <p class="lede">A limit order book matching engine that handles a message in tens of nanoseconds, an agent-based market where a market maker earns the spread and pays for being slow or uninformed, and the research that decides where to quote.</p>
+  <div class="tagrow">
+    <span class="tag">price-time priority</span><span class="tag">zero-allocation hot path</span><span class="tag">pre-trade risk</span><span class="tag">Hawkes order flow</span><span class="tag">GLFT · Avellaneda–Stoikov</span><span class="tag">bit-exact C++ ↔ Python replay</span>
+  </div>
+  <dl class="strip" id="strip"></dl>
+</header>
+
+<main>
+<section class="wrap" id="market">
+  <div class="sec-head">
+    <div class="eyebrow">01 · Live market</div>
+    <div>
+      <h2>Run the market maker</h2>
+      <p class="muted">This is the research simulator running in your browser: fair value with news jumps, background liquidity, clustered (Hawkes) noise flow, zero-latency arbitrageurs and informed takers. The blue quotes belong to a GLFT market maker using the parameters calibrated in section 03. Change its reference price, risk aversion or latency and watch the PnL and the markout respond.</p>
+    </div>
+  </div>
+  <div class="sim" id="sim">
+    <div class="sim-bar">
+      <div class="ctl"><span class="lbl">Reference price</span>
+        <div class="seg" id="refSeg" role="group" aria-label="Reference price">
+          <button type="button" data-ref="lead" aria-pressed="true">Lead</button><button type="button" data-ref="micro" aria-pressed="false">Microprice</button><button type="button" data-ref="mid" aria-pressed="false">Mid</button>
+        </div>
+      </div>
+      <div class="ctl"><label for="gamma">Risk aversion γ <output id="gammaOut"></output></label><input id="gamma" type="range" min="-3" max="0.3" step="0.01"></div>
+      <div class="ctl"><label for="latency">Latency <output id="latencyOut"></output></label><input id="latency" type="range" min="-1" max="3" step="0.01"></div>
+      <div class="ctl"><label for="informed">Informed flow <output id="informedOut"></output></label><input id="informed" type="range" min="0" max="3" step="0.05" value="1"></div>
+      <div class="ctl"><label for="vol">Volatility <output id="volOut"></output></label><input id="vol" type="range" min="0.4" max="3" step="0.05" value="1"></div>
+      <div class="ctl"><span class="lbl">Speed</span>
+        <div class="seg" id="speedSeg" role="group" aria-label="Simulation speed">
+          <button type="button" data-speed="1" aria-pressed="false">1×</button><button type="button" data-speed="4" aria-pressed="true">4×</button><button type="button" data-speed="16" aria-pressed="false">16×</button>
+        </div>
+      </div>
+      <div class="btns">
+        <button class="btn primary" type="button" id="playBtn">Pause</button>
+        <button class="btn" type="button" id="newsUp">News +8 ticks</button>
+        <button class="btn" type="button" id="newsDown">News −8 ticks</button>
+        <button class="btn" type="button" id="resetBtn">Reset</button>
+      </div>
+    </div>
+    <div class="sim-body">
+      <div class="ladder" id="ladder" aria-label="Order book ladder"></div>
+      <div class="plot">
+        <div class="legend">
+          <span><i style="background:var(--ink)"></i>fair value</span>
+          <span><i style="background:var(--rule-strong);height:8px"></i>best bid–ask</span>
+          <span><i style="background:var(--bid)"></i>MM bid</span>
+          <span><i style="background:var(--ask)"></i>MM ask</span>
+          <span>▲▼ MM fills</span>
+        </div>
+        <canvas id="priceCanvas" aria-label="Price chart, last 60 seconds"></canvas>
+        <div class="legend"><span><i style="background:var(--s3)"></i>inventory (lots)</span><span><i style="background:var(--accent)"></i>PnL (USD)</span><span class="muted">last 10 minutes</span></div>
+        <canvas id="invCanvas" aria-label="Inventory and PnL, last 10 minutes"></canvas>
+      </div>
+    </div>
+    <div class="tiles" id="tiles">
+      <div><span>PnL</span><b id="tPnl">$0</b></div>
+      <div><span>Inventory</span><b id="tInv">0</b></div>
+      <div><span>Filled</span><b id="tFills">0 lots</b></div>
+      <div><span>Edge captured / lot</span><b id="tEdge">–</b></div>
+      <div><span>Markout 10s / lot</span><b id="tMark">–</b></div>
+      <div><span>Session clock</span><b id="tClock">0:00</b></div>
+    </div>
+    <p class="sim-note" id="simNote"></p>
+  </div>
+</section>
+
+<section class="wrap" id="engine">
+  <div class="sec-head">
+    <div class="eyebrow">02 · Matching engine</div>
+    <div>
+      <h2>Tens of nanoseconds per message, no allocations, same tape every time</h2>
+      <p class="muted">Header-only C++20. Prices are integer ticks on a ladder indexed by tick offset; each level is an intrusive FIFO of slots in a preallocated arena; a 64-ary summary bitset finds the next non-empty level in O(log₆₄ N). Order ids carry a slot generation, so cancels are one array lookup. The engine never reads a clock, which makes it a deterministic state machine.</p>
+    </div>
+  </div>
+  <div class="diagram" role="img" aria-label="Architecture: participants send MWP frames to the gateway, which maps client ids and passes commands through the pre-trade risk gate to the matching engine; the engine writes an event tape used for execution reports, market data and the tape hash.">
+    <svg viewBox="0 0 1060 230" id="archSvg">
+      <defs><marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <rect class="box" x="10" y="70" width="150" height="80" rx="6"/><text x="85" y="104" text-anchor="middle">Participants</text><text class="sub" x="85" y="124" text-anchor="middle">MWP frames · 48 B</text>
+      <path class="arrow" d="M160 110 H210"/>
+      <rect class="box" x="212" y="60" width="170" height="100" rx="6"/><text x="297" y="94" text-anchor="middle">Gateway</text><text class="sub" x="297" y="114" text-anchor="middle">decode · validate</text><text class="sub" x="297" y="132" text-anchor="middle">(owner, clOrdId) → id</text>
+      <path class="arrow" d="M382 110 H432"/>
+      <rect class="box" x="434" y="60" width="170" height="100" rx="6"/><text x="519" y="94" text-anchor="middle">Pre-trade risk</text><text class="sub" x="519" y="114" text-anchor="middle">collar · notional · position</text><text class="sub" x="519" y="132" text-anchor="middle">throttle · kill switch</text>
+      <path class="arrow" d="M604 110 H654"/>
+      <rect class="box core" x="656" y="40" width="200" height="140" rx="6"/><text x="756" y="70" text-anchor="middle" style="font-weight:700">Order books</text><text class="sub" x="756" y="92" text-anchor="middle">tick ladder + summary bitset</text><text class="sub" x="756" y="110" text-anchor="middle">intrusive FIFO per level</text><text class="sub" x="756" y="128" text-anchor="middle">slot arena, generation ids</text><text class="sub" x="756" y="146" text-anchor="middle">IOC · FOK · post-only · STP</text>
+      <path class="arrow" d="M856 110 H906"/>
+      <rect class="box" x="908" y="20" width="142" height="50" rx="6"/><text x="979" y="50" text-anchor="middle">Exec reports</text>
+      <rect class="box" x="908" y="85" width="142" height="50" rx="6"/><text x="979" y="115" text-anchor="middle">Market data (L2)</text>
+      <rect class="box" x="908" y="150" width="142" height="50" rx="6"/><text x="979" y="180" text-anchor="middle">Tape hash</text>
+      <path class="arrow" d="M880 110 V45 H906"/><path class="arrow" d="M880 110 V175 H906"/>
+      <text class="sub" x="756" y="214" text-anchor="middle">event tape: one fixed-size record per output, drained after each command</text>
+    </svg>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <h3>Latency by message type</h3>
+      <p id="latCaption"></p>
+      <div class="chart" id="latChart"></div>
+      <div class="legend"><span><i style="background:var(--s1)"></i>p50</span><span><i style="background:var(--s3)"></i>p99</span><span><i style="background:var(--s2)"></i>p99.9</span><span class="muted">○ engine only · ● with risk gate</span></div>
+    </div>
+    <div class="card">
+      <h3>Measured</h3>
+      <div class="tbl-wrap"><table id="latTable"></table></div>
+      <p id="benchNote"></p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="research">
+  <div class="sec-head">
+    <div class="eyebrow">03 · Research</div>
+    <div>
+      <h2>Where to quote, and what speed is worth</h2>
+      <p class="muted" id="researchIntro"></p>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3>1 · Fill intensity calibration</h3>
+      <p>Probe quotes at random depths. Fills per second of resting time fall off exponentially with distance from fair value; the fit gives the A and κ that the closed-form quotes need.</p>
+      <div class="chart" id="calChart"></div>
+    </div>
+    <div class="card">
+      <h3>2 · Tuning on in-sample seeds</h3>
+      <p>Each strategy family is tuned on its own grid using in-sample seeds only. Points trace mean versus standard deviation of hourly PnL; the ringed point is the Sharpe-maximising choice carried out of sample.</p>
+      <div class="chart" id="frontierChart"></div>
+      <div class="legend" id="frontierLegend"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <h3>3 · Out-of-sample comparison</h3>
+    <p id="oosCaption"></p>
+    <div class="chart" id="stripChart" style="min-height:250px"></div>
+    <div class="tbl-wrap"><table id="oosTable"></table></div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <h3>4 · Markouts</h3>
+      <p>Average gain per lot, measured against fair value, at each horizon after a fill. A curve that sags at the right is losing its edge to informed flow; the drop near 10 s is the informed traders' horizon.</p>
+      <div class="chart" id="markoutChart"></div>
+      <div class="legend" id="markoutLegend"></div>
+    </div>
+    <div class="card">
+      <h3>5 · The cost of latency</h3>
+      <p id="latencyCaption"></p>
+      <div class="chart" id="latencyChart"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <h3>6 · Quoting through news</h3>
+    <p id="traceCaption"></p>
+    <div class="chart" id="traceChart" style="min-height:300px"></div>
+    <div class="legend"><span><i style="background:var(--ink)"></i>fair value</span><span><i style="background:var(--rule-strong)"></i>best bid / ask</span><span><i style="background:var(--bid)"></i>MM bid</span><span><i style="background:var(--ask)"></i>MM ask</span><span>▲ bought · ▼ sold</span></div>
+  </div>
+</section>
+
+<section class="wrap" id="real">
+  <div class="sec-head">
+    <div class="eyebrow">04 · Real data</div>
+    <div>
+      <h2>Binance BTCUSDT, recorded and replayed</h2>
+      <p class="muted" id="realIntro"></p>
+    </div>
+  </div>
+  <dl class="strip" id="realStrip" style="margin-top:0"></dl>
+  <div class="card" style="margin-top:20px">
+    <h3>What resting liquidity actually earns</h3>
+    <p id="rsCaption"></p>
+    <div class="chart" id="rsChart"></div>
+    <div class="legend" id="rsLegend"></div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <h3>Does the perpetual lead spot?</h3>
+      <p id="leadCaption"></p>
+      <div class="chart" id="leadChart"></div>
+    </div>
+    <div class="card">
+      <h3>Fill intensity on the real book</h3>
+      <p id="realCalCaption"></p>
+      <div class="chart" id="realCalChart"></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <h3>Out-of-sample replay</h3>
+    <p id="realOosCaption"></p>
+    <div class="tbl-wrap"><table id="realTable"></table></div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <h3>Markouts after fills</h3>
+      <p>Value of a filled BTC against the spot mid at each horizon after the fill. Below zero means the counterparty was right: the price kept moving through the quote.</p>
+      <div class="chart" id="realMarkoutChart"></div>
+      <div class="legend" id="realMarkoutLegend"></div>
+    </div>
+    <div class="card">
+      <h3>Fees decide the outcome</h3>
+      <p id="feeCaption"></p>
+      <div class="chart" id="feeChart"></div>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:20px">
+    <div class="card">
+      <h3>Latency on the real book</h3>
+      <p id="realLatCaption"></p>
+      <div class="chart" id="realLatChart"></div>
+    </div>
+    <div class="card">
+      <h3>Replay trace</h3>
+      <p id="realTraceCaption"></p>
+      <div class="chart" id="realTraceChart" style="min-height:250px"></div>
+      <div class="legend"><span><i style="background:var(--ink)"></i>spot mid</span><span><i style="background:var(--s5)"></i>perp-led fair value</span><span><i style="background:var(--bid)"></i>our bid</span><span><i style="background:var(--ask)"></i>our ask</span><span>▲▼ fills</span></div>
+    </div>
+  </div>
+  <div class="facts" id="realFacts" style="margin-top:28px"></div>
+  <div class="card" id="paperCard" style="margin-top:28px">
+    <h3>Live paper trading</h3>
+    <p id="paperCaption"></p>
+    <div class="tbl-wrap"><table id="paperTable"></table></div>
+  </div>
+</section>
+
+<section class="wrap" id="verification">
+  <div class="sec-head">
+    <div class="eyebrow">05 · Verification</div>
+    <div>
+      <h2>Two independent implementations, one trade tape</h2>
+      <p class="muted">The Python simulator records every order it sends as an MWP tape. The C++ engine replays the tape and must reproduce the same trades in the same order, folded into the same 64-bit hash. The optimized book is also fuzzed against a deliberately naive reference model after every single command.</p>
+    </div>
+  </div>
+  <div class="facts" id="facts"></div>
+  <ul class="checks" id="checks" style="margin-top:24px"></ul>
+</section>
+
+<section class="wrap" id="run">
+  <div class="sec-head">
+    <div class="eyebrow">06 · Reproduce</div>
+    <div><h2>Build, test, measure</h2><p class="muted">Everything on this page is regenerated from the repository by these commands.</p></div>
+  </div>
+  <pre class="cmd"><span class="c"># engine: build (clang++ ≥ 17 or g++ ≥ 13), test, benchmark</span>
+cmake -S engine -B engine/build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build engine/build
+engine/build/meridian_tests
+engine/build/meridian_bench --ops 5000000 --json results/bench.json
+
+<span class="c"># research: tests (includes C++ cross-check), then the full study</span>
+cd research &amp;&amp; python -m pytest
+python -m meridian_research.study --out ../results
+
+<span class="c"># real data: record Binance public streams (no keys, no orders), then replay and calibrate</span>
+python -m meridian_research.binance.recorder --minutes 90 --out ../data/binance
+python -m meridian_research.binance.study ../data/binance/&lt;session&gt; --out ../results/real
+
+<span class="c"># live paper trading (virtual orders only), then an exact offline replay of the same session</span>
+python -m meridian_research.binance.paper --minutes 15 --record
+python -m meridian_research.binance.paper --replay ../results/paper/&lt;paper_session&gt; --verify
+
+<span class="c"># this page</span>
+python dashboard/build.py</pre>
+</section>
+</main>
+
+<footer class="wrap">
+  <p id="footStamp"></p>
+  <p>Simulation results describe a synthetic market. Fees beyond the maker rebate, queue competition from other fast market makers, hedging costs and capital charges are not modelled, so absolute PnL and Sharpe ratios are far higher than a live desk would see; the comparisons between strategies, reference prices and latencies are the result.</p>
+</footer>
+
+<script id="meridian-data" type="application/json">__MERIDIAN_DATA__</script>
+<script>
+"use strict";
+const DATA = JSON.parse(document.getElementById("meridian-data").textContent);
+const BENCH = DATA.bench, STUDY = DATA.study, TESTS = DATA.tests;
+const $ = (s, r = document) => r.querySelector(s);
+const SVGNS = "http://www.w3.org/2000/svg";
+
+// ---------------------------------------------------------------- formatting
+const usd = (v, d = 0) => (v < 0 ? "−$" : "$") + Math.abs(v).toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+const sgnUsd = v => (v > 0 ? "+" : "") + usd(v);
+const f = (v, d = 2) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(d);
+const fNs = v => v >= 1000 ? (v / 1000).toFixed(v >= 10000 ? 0 : 1) + " µs" : Math.round(v) + " ns";
+const fLat = s => s < 0.001 ? (s * 1e6).toFixed(0) + " µs" : s < 1 ? (+(s * 1e3).toPrecision(3)) + " ms" : s + " s";
+const COLORS = ["--s4", "--s5", "--s2", "--s3", "--s1"];
+let THEME = {};
+function readTheme() {
+  const cs = getComputedStyle(document.documentElement);
+  for (const k of ["--paper", "--panel", "--ink", "--muted", "--faint", "--rule", "--rule-strong", "--accent", "--accent-soft",
+    "--bid", "--bid-soft", "--ask", "--ask-soft", "--good", "--bad", "--s1", "--s2", "--s3", "--s4", "--s5"]) THEME[k] = cs.getPropertyValue(k).trim();
+  THEME.mono = cs.getPropertyValue("--font-mono").trim();
+}
+readTheme();
+
+// ---------------------------------------------------------------- tiny SVG plotting
+function el(tag, attrs = {}, parent) {
+  const n = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+function niceTicks(lo, hi, n = 5) {
+  const span = hi - lo || 1, step0 = span / n, mag = 10 ** Math.floor(Math.log10(step0));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => span / s <= n + 0.5) || mag * 10;
+  const out = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + step * 1e-9; v += step) out.push(+v.toPrecision(12));
+  return out;
+}
+function logTicks(lo, hi) {
+  const out = [];
+  for (let e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++)
+    for (const m of [1, 2, 5]) { const v = m * 10 ** e; if (v >= lo * 0.999 && v <= hi * 1.001) out.push(v); }
+  return out;
+}
+function scale(d, r, log) {
+  if (log) { const a = Math.log(d[0]), b = Math.log(d[1]); return v => r[0] + (Math.log(v) - a) / (b - a) * (r[1] - r[0]); }
+  return v => r[0] + (v - d[0]) / (d[1] - d[0]) * (r[1] - r[0]);
+}
+// spec: {height, margin, x:{domain, log, ticks, fmt, label}, y:{...}, draw(g, X, Y, W, H)}
+function plot(container, spec) {
+  const render = () => {
+    const W = Math.max(280, container.clientWidth), H = spec.height || 260;
+    const m = Object.assign({ t: 12, r: 16, b: 38, l: 52 }, spec.margin || {});
+    container.innerHTML = "";
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H, role: "img", "aria-label": spec.label || "" }, container);
+    const X = scale(spec.x.domain, [m.l, W - m.r], spec.x.log), Y = scale(spec.y.domain, [H - m.b, m.t], spec.y.log);
+    const ax = el("g", { class: "ax" }, svg);
+    const xt = spec.x.ticks || (spec.x.log ? logTicks(...spec.x.domain) : niceTicks(...spec.x.domain, Math.max(3, Math.floor(W / 110))));
+    const yt = spec.y.ticks || (spec.y.log ? logTicks(...spec.y.domain) : niceTicks(...spec.y.domain, 5));
+    for (const v of yt) {
+      el("line", { class: "gridl", x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v) }, ax);
+      el("text", { x: m.l - 7, y: Y(v) + 4, "text-anchor": "end" }, ax).textContent = (spec.y.fmt || String)(v);
+    }
+    for (const v of xt) {
+      el("line", { x1: X(v), x2: X(v), y1: H - m.b, y2: H - m.b + 4 }, ax);
+      el("text", { x: X(v), y: H - m.b + 17, "text-anchor": "middle" }, ax).textContent = (spec.x.fmt || String)(v);
+    }
+    el("line", { x1: m.l, x2: W - m.r, y1: H - m.b, y2: H - m.b }, ax);
+    if (spec.x.label) el("text", { class: "axlabel", x: (m.l + W - m.r) / 2, y: H - 4, "text-anchor": "middle" }, svg).textContent = spec.x.label;
+    if (spec.y.label) el("text", { class: "axlabel", x: -(m.t + H - m.b) / 2, y: 13, transform: "rotate(-90)", "text-anchor": "middle" }, svg).textContent = spec.y.label;
+    spec.draw(el("g", {}, svg), X, Y, W, H, m);
+  };
+  render();
+  let raf = 0;
+  new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(render); }).observe(container);
+}
+const pathOf = (pts, X, Y, step) => pts.filter(p => p[1] != null && isFinite(p[1])).map((p, i, a) => {
+  if (!i) return `M${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`;
+  return step ? `H${X(p[0]).toFixed(1)}V${Y(p[1]).toFixed(1)}` : `L${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`;
+}).join("");
+function stepPath(ts, vs, X, Y) {  // breaks the line on nulls
+  let d = "", open = false;
+  for (let i = 0; i < ts.length; i++) {
+    const v = vs[i];
+    if (v == null) { open = false; continue; }
+    const x = X(ts[i]).toFixed(1), y = Y(v).toFixed(1);
+    d += open ? `H${x}V${y}` : `M${x},${y}`;
+    open = true;
+  }
+  return d;
+}
+
+// ---------------------------------------------------------------- header strip
+(function header() {
+  const e = BENCH.latency.engine, cmp = STUDY.comparison, lead = cmp[cmp.length - 1];
+  const replay = STUDY.replay;
+  const items = [
+    ["Median latency, all messages", `${Math.round(e.all.p50_ns)}<small> ns</small>`],
+    ["p99.9 latency", `${Math.round(e.all.p99_9_ns)}<small> ns</small>`],
+    ["Throughput (replay)", `${(BENCH.throughput.best_msgs_per_sec / 1e6).toFixed(1)}<small> M msg/s</small>`],
+    ["GLFT · lead, out of sample", `${usd(lead.pnl_mean_usd)}<small> /h · SR ${lead.sharpe_annualized.toFixed(0)}</small>`],
+    ["C++ ↔ Python tape hash", replay.match ? `<span class="ok">match</span><small> ${replay.frames.toLocaleString("en-US")} msgs</small>` : "mismatch"],
+  ];
+  $("#strip").innerHTML = items.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("");
+})();
+
+// ---------------------------------------------------------------- engine section
+(function engine() {
+  const kinds = [["all", "All messages"], ["add_passive", "Add (passive)"], ["add_marketable", "Add (marketable)"], ["cancel", "Cancel"], ["replace", "Replace"]];
+  const L = BENCH.latency;
+  $("#latCaption").textContent = `${(BENCH.measured_ops / 1e6).toFixed(0)}M messages after ${(BENCH.warmup_ops / 1e3).toFixed(0)}k warm-up, about ${Math.round(L.engine.avg_resting_orders / 1000)}k orders resting. Time per call to the engine, log scale.`;
+  plot($("#latChart"), {
+    height: 250, margin: { l: 118, b: 36 }, label: "Latency percentiles by message type",
+    x: { domain: [10, 2000], log: true, ticks: [10, 20, 50, 100, 200, 500, 1000, 2000], fmt: fNs },
+    y: { domain: [0, kinds.length], ticks: [] },
+    draw(g, X, Y) {
+      kinds.forEach(([k, label], i) => {
+        const yc = Y(kinds.length - i - 0.5);
+        el("text", { class: "axlabel", x: 8, y: yc + 4 }, g).textContent = label;
+        el("line", { class: "gridl", x1: X(10), x2: X(2000), y1: yc, y2: yc }, g);
+        [["engine", -5, true], ["engine_with_risk", 5, false]].forEach(([run, dy, hollow]) => {
+          const h = L[run][k];
+          el("line", { x1: X(h.p50_ns), x2: X(h.p99_9_ns), y1: yc + dy, y2: yc + dy, stroke: "var(--rule-strong)", "stroke-width": 2 }, g);
+          [["p50_ns", "--s1"], ["p99_ns", "--s3"], ["p99_9_ns", "--s2"]].forEach(([p, c]) => {
+            el("circle", { cx: X(h[p]), cy: yc + dy, r: 4.2, fill: hollow ? "var(--panel)" : `var(${c})`, stroke: `var(${c})`, "stroke-width": 1.8 }, g);
+          });
+        });
+      });
+    },
+  });
+  const rows = kinds.map(([k, label]) => {
+    const a = L.engine[k], b = L.engine_with_risk[k];
+    return `<tr><td>${label}</td><td>${Math.round(a.p50_ns)}</td><td>${Math.round(a.p99_ns)}</td><td>${Math.round(a.p99_9_ns)}</td><td>${Math.round(a.p99_99_ns)}</td><td>${Math.round(b.p50_ns)}</td><td>${Math.round(b.p99_9_ns)}</td></tr>`;
+  });
+  $("#latTable").innerHTML = `<thead><tr><th>ns</th><th>p50</th><th>p99</th><th>p99.9</th><th>p99.99</th><th>p50 risk</th><th>p99.9 risk</th></tr></thead><tbody>${rows.join("")}</tbody>`;
+  $("#benchNote").innerHTML = `${BENCH.cpu}, clang ${BENCH.compiler.split(" ")[1]}, <code>-O3 -march=native</code>, thread pinned. Timer: serialized TSC reads at ${BENCH.tsc_ghz.toFixed(2)} GHz with the ${BENCH.timer_overhead_cycles}-cycle bracket subtracted; this CPU's TSC advances in steps of about 10 ns, so differences below that are not resolved. Heap allocations inside the timed region: <b>${L.engine.heap_allocations_in_timed_region}</b>. Replaying the ${(BENCH.throughput.commands / 1e6).toFixed(1)}M-message tape: <b>${(BENCH.throughput.best_msgs_per_sec / 1e6).toFixed(1)}M msg/s</b>, identical tape hash on every replay.`;
+})();
+
+// ---------------------------------------------------------------- research section
+const CMP = STUDY.comparison;
+const colorOf = i => `var(${COLORS[i % COLORS.length]})`;
+(function research() {
+  const cal = STUDY.calibration, g = STUDY.glft;
+  const n = STUDY.seeds.out_of_sample.length, hrs = STUDY.market.duration_s / 3600;
+  $("#researchIntro").textContent = `${STUDY.sessions.toLocaleString("en-US")} simulated sessions of ${hrs} h each, ${STUDY.runtime_s.toFixed(0)} s of wall time on all cores. Strategies are tuned on ${STUDY.seeds.in_sample.length} in-sample seeds and compared on ${n} disjoint out-of-sample seeds; every session also draws its own volatility and flow regime.`;
+
+  // calibration
+  const pts = cal.depth.map((d, i) => [d, cal.intensity[i], cal.fills[i]]).filter(p => p[1] > 0 && p[2] >= 20);
+  const ymin = Math.min(...pts.map(p => p[1])) * 0.6, ymax = Math.max(...pts.map(p => p[1]), cal.A) * 1.4;
+  plot($("#calChart"), {
+    height: 250, label: "Fill intensity versus quote depth", margin: { l: 56 },
+    x: { domain: [0, Math.max(...cal.depth) + 0.15], label: "depth from fair value δ (ticks)" },
+    y: { domain: [ymin, ymax], log: true, label: "fills / s", fmt: v => v >= 1 ? v.toFixed(0) : v >= 0.1 ? v.toFixed(1) : v.toPrecision(1) },
+    draw(gr, X, Y, W) {
+      const line = []; for (let d = 0; d <= Math.max(...cal.depth) + 0.15; d += 0.05) line.push([d, cal.A * Math.exp(-cal.kappa * d)]);
+      el("path", { d: pathOf(line.filter(p => p[1] >= ymin), X, Y), fill: "none", stroke: "var(--s2)", "stroke-width": 2 }, gr);
+      const maxF = Math.max(...pts.map(p => p[2]));
+      for (const [d, l, nf] of pts) el("circle", { cx: X(d), cy: Y(l), r: 3 + 5 * Math.sqrt(nf / maxF), fill: "var(--s1)", "fill-opacity": 0.75 }, gr);
+      el("text", { class: "annot", x: W - 20, y: 24, "text-anchor": "end" }, gr).textContent = `λ(δ) = ${cal.A.toFixed(2)} · e^(−${cal.kappa.toFixed(2)} δ)   R² = ${cal.r2.toFixed(3)}`;
+      el("text", { class: "axlabel", x: W - 20, y: 42, "text-anchor": "end" }, gr).textContent = `σ = ${cal.sigma.toFixed(2)} ticks/√s · GLFT γ* = ${g.gamma} → half-spread ${g.half_spread_ticks.toFixed(2)} ticks`;
+    },
+  });
+
+  // frontier
+  const fams = Object.entries(STUDY.tuning);
+  const famColor = { Symmetric: "--s4", AvellanedaStoikov: "--s5", GLFT: "--s1" };
+  const famName = { Symmetric: "Symmetric (half-spread)", AvellanedaStoikov: "Avellaneda–Stoikov (γ)", GLFT: "GLFT (γ)" };
+  const all = fams.flatMap(([, rows]) => rows);
+  const xs = all.map(r => r.pnl_std_usd), ys = all.map(r => r.pnl_mean_usd);
+  plot($("#frontierChart"), {
+    height: 260, label: "Mean versus standard deviation of hourly PnL", margin: { l: 58 },
+    x: { domain: [Math.min(...xs) * 0.9, Math.max(...xs) * 1.05], label: "std of PnL per session (USD)", fmt: v => usd(v) },
+    y: { domain: [Math.min(0, ...ys) - 200, Math.max(...ys) * 1.12], label: "mean PnL (USD)", fmt: v => usd(v) },
+    draw(gr, X, Y) {
+      el("line", { class: "zero", x1: X(Math.min(...xs) * 0.9), x2: X(Math.max(...xs) * 1.05), y1: Y(0), y2: Y(0) }, gr);
+      for (const [fam, rows] of fams) {
+        const c = `var(${famColor[fam]})`;
+        el("path", { d: pathOf(rows.map(r => [r.pnl_std_usd, r.pnl_mean_usd]), X, Y), fill: "none", stroke: c, "stroke-width": 1.6, "stroke-opacity": 0.7 }, gr);
+        const best = rows.reduce((a, b) => (b.sharpe_annualized > a.sharpe_annualized ? b : a));
+        rows.forEach(r => el("circle", { cx: X(r.pnl_std_usd), cy: Y(r.pnl_mean_usd), r: 3.4, fill: c }, gr));
+        el("circle", { cx: X(best.pnl_std_usd), cy: Y(best.pnl_mean_usd), r: 8, fill: "none", stroke: c, "stroke-width": 2 }, gr);
+      }
+    },
+  });
+  $("#frontierLegend").innerHTML = fams.map(([fam, rows]) => {
+    const best = rows.reduce((a, b) => (b.sharpe_annualized > a.sharpe_annualized ? b : a));
+    return `<span><i style="background:var(${famColor[fam]})"></i>${famName[fam]}: best ${best.param} (SR ${best.sharpe_annualized.toFixed(0)})</span>`;
+  }).join("");
+
+  // OOS strip plot
+  const allP = CMP.flatMap(c => c.pnl_by_session);
+  const lo = Math.min(...allP), hi = Math.max(...allP);
+  $("#oosCaption").textContent = `Each dot is one ${hrs}-hour out-of-sample session (${n} per strategy); bars mark the mean. The GLFT rows differ only in the reference price their quotes are centred on.`;
+  plot($("#stripChart"), {
+    height: 40 + CMP.length * 42, margin: { l: 150, b: 34 }, label: "Out-of-sample PnL per session by strategy",
+    x: { domain: [lo - (hi - lo) * 0.05, hi + (hi - lo) * 0.05], fmt: v => usd(v), label: "PnL per session (USD)" },
+    y: { domain: [0, CMP.length], ticks: [] },
+    draw(gr, X, Y) {
+      el("line", { class: "zero", x1: X(0), x2: X(0), y1: Y(0), y2: Y(CMP.length) }, gr);
+      CMP.forEach((c, i) => {
+        const yc = Y(CMP.length - i - 0.5), col = colorOf(i);
+        el("text", { class: "axlabel", x: 8, y: yc + 4, style: "font-weight:600;fill:var(--ink)" }, gr).textContent = c.label;
+        c.pnl_by_session.forEach((p, k) => el("circle", { cx: X(p), cy: yc + ((k * 7) % 15) - 7, r: 3.6, fill: col, "fill-opacity": 0.55 }, gr));
+        el("line", { x1: X(c.pnl_mean_usd), x2: X(c.pnl_mean_usd), y1: yc - 13, y2: yc + 13, stroke: col, "stroke-width": 3 }, gr);
+      });
+    },
+  });
+  const best = CMP.reduce((a, b) => (b.pnl_mean_usd > a.pnl_mean_usd ? b : a));
+  $("#oosTable").innerHTML = `<thead><tr><th>Strategy</th><th>PnL / h</th><th>± s.e.</th><th>Sharpe</th><th>Win</th><th>Spread</th><th>Rebates</th><th>Inventory</th><th>Edge / lot</th><th>Net / lot</th><th>|q| avg</th><th>Quoted</th></tr></thead><tbody>` +
+    CMP.map((c, i) => `<tr class="${c === best ? "hl" : ""}"><td><span class="sw" style="background:${colorOf(i)}"></span>${c.label}</td><td class="${c.pnl_mean_usd >= 0 ? "pos" : "neg"}">${usd(c.pnl_mean_usd)}</td><td>${usd(c.pnl_sem_usd)}</td><td>${c.sharpe_annualized.toFixed(1)}</td><td>${Math.round(c.win_rate * 100)}%</td><td>${usd(c.spread_usd)}</td><td>${usd(c.rebates_usd)}</td><td>${usd(c.inventory_usd)}</td><td>${f(c.edge_per_lot_ticks)}</td><td>${f(c.pnl_per_lot_ticks)}</td><td>${c.inventory_abs_mean.toFixed(1)}</td><td>${c.quoted_spread_ticks.toFixed(2)}</td></tr>`).join("") + "</tbody>";
+
+  // markouts
+  const hs = Object.keys(CMP[0].markout_fair).map(Number);
+  const mv = CMP.flatMap(c => Object.values(c.markout_fair));
+  plot($("#markoutChart"), {
+    height: 250, label: "Markout per lot versus horizon", margin: { l: 46 },
+    x: { domain: [hs[0], hs[hs.length - 1]], log: true, ticks: [0.1, 0.5, 1, 5, 10, 60], fmt: v => v + "s", label: "horizon after fill" },
+    y: { domain: [Math.min(0, ...mv) - 0.2, Math.max(...mv) + 0.3], label: "ticks / lot" },
+    draw(gr, X, Y) {
+      el("line", { class: "zero", x1: X(hs[0]), x2: X(hs[hs.length - 1]), y1: Y(0), y2: Y(0) }, gr);
+      CMP.forEach((c, i) => {
+        const p = hs.map(h => [h, c.markout_fair[String(h)] ?? c.markout_fair[h.toFixed(1)]]);
+        el("path", { d: pathOf(p, X, Y), fill: "none", stroke: colorOf(i), "stroke-width": i === CMP.length - 1 ? 2.6 : 1.7 }, gr);
+        p.forEach(q => el("circle", { cx: X(q[0]), cy: Y(q[1]), r: 2.6, fill: colorOf(i) }, gr));
+      });
+    },
+  });
+  $("#markoutLegend").innerHTML = CMP.map((c, i) => `<span><i style="background:${colorOf(i)}"></i>${c.label}</span>`).join("");
+
+  // latency
+  const L = STUDY.latency;
+  const l0 = L[0], lN = L[L.length - 1];
+  $("#latencyCaption").textContent = `GLFT · lead out of sample with only order-entry latency changed. Going from ${fLat(l0.latency_s)} to ${fLat(lN.latency_s)} cuts PnL from ${usd(l0.pnl_mean_usd)} to ${usd(lN.pnl_mean_usd)} an hour, ${Math.round((1 - lN.pnl_mean_usd / l0.pnl_mean_usd) * 100)}% less: stale quotes left on the book after news are picked off by the arbitrageurs.`;
+  const lp = L.map(r => r.pnl_mean_usd);
+  plot($("#latencyChart"), {
+    height: 250, label: "PnL versus order-entry latency", margin: { l: 58 },
+    x: { domain: [L[0].latency_s * 1e3 * 0.8, lN.latency_s * 1e3 * 1.25], log: true, ticks: [0.1, 1, 10, 100, 1000], fmt: v => v >= 1000 ? v / 1000 + " s" : v + " ms", label: "order-entry latency" },
+    y: { domain: [Math.min(0, ...lp) - 300, Math.max(...lp) * 1.15], fmt: v => usd(v), label: "mean PnL / h" },
+    draw(gr, X, Y) {
+      el("line", { class: "zero", x1: X(L[0].latency_s * 1e3 * 0.8), x2: X(lN.latency_s * 1e3 * 1.25), y1: Y(0), y2: Y(0) }, gr);
+      L.forEach(r => el("line", { x1: X(r.latency_s * 1e3), x2: X(r.latency_s * 1e3), y1: Y(r.pnl_mean_usd - 2 * r.pnl_sem_usd), y2: Y(r.pnl_mean_usd + 2 * r.pnl_sem_usd), stroke: "var(--s1)", "stroke-opacity": 0.45, "stroke-width": 6, "stroke-linecap": "round" }, gr));
+      el("path", { d: pathOf(L.map(r => [r.latency_s * 1e3, r.pnl_mean_usd]), X, Y), fill: "none", stroke: "var(--s1)", "stroke-width": 2.2 }, gr);
+      L.forEach(r => el("circle", { cx: X(r.latency_s * 1e3), cy: Y(r.pnl_mean_usd), r: 3.6, fill: "var(--s1)" }, gr));
+    },
+  });
+
+  // trace
+  const z = STUDY.trace.zoom, fills = STUDY.trace.zoom_fills;
+  const tv = [...z.fair, ...z.best_bid, ...z.best_ask, ...z.mm_bid, ...z.mm_ask].filter(v => v != null);
+  const t0 = z.t[0];
+  $("#traceCaption").textContent = `One minute of the recorded out-of-sample session around its largest fair-value move (${STUDY.trace.jump_ticks.toFixed(1)} ticks in 100 ms). The market maker re-centres within its latency, skews quotes against its inventory, and the book catches up as the arbitrageurs clear stale orders.`;
+  plot($("#traceChart"), {
+    height: 300, label: "Quotes and fair value around a news jump", margin: { l: 58 },
+    x: { domain: [0, z.t[z.t.length - 1] - t0], fmt: v => v.toFixed(0) + "s", label: "seconds" },
+    y: { domain: [Math.min(...tv) - 1, Math.max(...tv) + 1], fmt: v => v.toFixed(0), label: "price (ticks)" },
+    draw(gr, X, Y) {
+      const ts = z.t.map(t => t - t0);
+      el("path", { d: stepPath(ts, z.best_bid, X, Y), fill: "none", stroke: "var(--rule-strong)", "stroke-width": 1.2 }, gr);
+      el("path", { d: stepPath(ts, z.best_ask, X, Y), fill: "none", stroke: "var(--rule-strong)", "stroke-width": 1.2 }, gr);
+      el("path", { d: stepPath(ts, z.mm_bid, X, Y), fill: "none", stroke: "var(--bid)", "stroke-width": 2 }, gr);
+      el("path", { d: stepPath(ts, z.mm_ask, X, Y), fill: "none", stroke: "var(--ask)", "stroke-width": 2 }, gr);
+      el("path", { d: pathOf(ts.map((t, i) => [t, z.fair[i]]), X, Y), fill: "none", stroke: "var(--ink)", "stroke-width": 1.4 }, gr);
+      for (const [t, side, px] of fills) {
+        const x = X(t - t0), y = Y(px);
+        el("path", { d: side > 0 ? `M${x},${y - 6}l5,9h-10z` : `M${x},${y + 6}l5,-9h-10z`, fill: side > 0 ? "var(--bid)" : "var(--ask)" }, gr);
+      }
+    },
+  });
+})();
+
+// ---------------------------------------------------------------- verification
+(function verification() {
+  const r = STUDY.replay, T = TESTS;
+  $("#facts").innerHTML = [
+    [r.python_hash, `tape hash from the Python simulator and from the C++ engine for the ${r.frames.toLocaleString("en-US")}-message session, ${r.engine_trades.toLocaleString("en-US")} trades. Engine replay took ${r.engine_ms.toFixed(1)} ms.`],
+    [`${T.fuzz_seeds} × ${T.fuzz_steps.toLocaleString("en-US")}`, "seeds × commands of differential fuzzing against the naive reference book, with depth, market data and structural invariants checked after every command."],
+    [`${(T.cpp.passed + T.python.passed).toLocaleString("en-US")} / ${(T.cpp.total + T.python.total).toLocaleString("en-US")}`, `tests passing: ${T.cpp.total} C++ (GoogleTest) and ${T.python.total} Python (pytest), the C++ suite also under AddressSanitizer and UBSan.`],
+  ].map(([b, p]) => `<div class="fact"><b>${b}</b><p>${p}</p></div>`).join("");
+  const ok = v => `<span class="mark${v ? "" : " fail"}">${v ? "✓" : "✗"}</span>`;
+  const checks = [
+    [r.match, "C++ engine reproduces the Python simulator's trade tape bit for bit", `${r.engine_hash}`],
+    [T.cpp.passed === T.cpp.total, "Engine unit, risk, protocol and fuzz tests", `${T.cpp.passed}/${T.cpp.total}`],
+    [T.asan === null ? true : T.asan.passed === T.asan.total, "Same suite under AddressSanitizer + UndefinedBehaviorSanitizer", T.asan ? `${T.asan.passed}/${T.asan.total}` : "not run"],
+    [T.python.passed === T.python.total, "Research tests, including three random flows replayed through the C++ engine", `${T.python.passed}/${T.python.total}`],
+    [BENCH.latency.engine.heap_allocations_in_timed_region === 0, "No heap allocation inside the timed region over the whole benchmark", `${BENCH.latency.engine.heap_allocations_in_timed_region} allocations`],
+    [BENCH.throughput.deterministic_replay, "Benchmark tape replays to the same hash on fresh engines", BENCH.tape_hash],
+  ];
+  $("#checks").innerHTML = checks.map(([v, t, val]) => `<li>${ok(v)}<span>${t}</span><span class="val">${val}</span></li>`).join("");
+  $("#footStamp").textContent = `Generated ${STUDY.generated_at.replace("T", " ")} from results/study.json and results/bench.json.`;
+})();
+
+// ---------------------------------------------------------------- real data (Binance BTCUSDT)
+(function realData() {
+  const R = DATA.real;
+  if (!R) { $("#real").hidden = true; return; }
+  const v = R.validation, st = R.stats.full, h = R.hawkes, ll = R.lead_lag, fi = R.fill_intensity, C = R.comparison;
+  const fin = x => x != null && isFinite(x);
+  const fx = (x, d = 2) => fin(x) ? f(x, d) : "–";
+  const day = /^\d{8}T/.test(R.session) ? `${R.session.slice(0, 4)}-${R.session.slice(4, 6)}-${R.session.slice(6, 8)}` : R.generated_at.slice(0, 10);
+  $("#realIntro").textContent = `${v.minutes.toFixed(0)} minutes of Binance public market data recorded on ${day} (UTC): spot BTCUSDT depth diffs every 100 ms, every trade and every best-quote change, plus the USD-M perpetual's best quotes. The spot book is rebuilt from a REST snapshot and the diff stream using Binance's sequence rules, with ${v.sequence_gaps} sequence gaps; ${v.audit_near_touch_mismatched} of ${v.audit_near_touch_levels.toLocaleString("en-US")} levels within $200 of the touch differed from the audit snapshots. The section 03 strategies then trade against this book as virtual orders with a queue model. The first half of the recording is used for calibration and tuning, the second half is out of sample. No order was sent to the exchange.`;
+  const items = [
+    ["Spread at one tick ($0.01)", `${(st.spread_one_tick_time_frac * 100).toFixed(1)}<small>% of time</small>`],
+    ["Median size at the touch", `${st.touch_qty_median_btc.toFixed(2)}<small> BTC</small>`],
+    ["Volatility", `$${(st.sigma_ticks_per_sqrt_s / 100).toFixed(2)}<small>/√s · ${st.sigma_annualized_pct.toFixed(0)}% ann.</small>`],
+    ["Spot volume", `$${(st.volume_usd_per_hour / 1e6).toFixed(1)}M<small> /h</small>`],
+    ["Hawkes branching ratio", `${h.branching_ratio.toFixed(2)}<small> · half-life ${(h.half_life_s * 1e3).toFixed(0)} ms</small>`],
+  ];
+  $("#realStrip").innerHTML = items.map(([k, x]) => `<div><dt>${k}</dt><dd>${x}</dd></div>`).join("");
+
+  const RS = R.realized_spreads.out_of_sample, rsG = RS.groups, rsH = RS.horizons;
+  const at = (g, h) => rsG[g].markout[String(h)] ?? rsG[g].markout[h.toFixed(1)];
+  const rsNames = [["all", "all trades", "--ink"], ["gap with maker", "perp gap with the maker", "--s3"], ["neutral", "neutral", "--faint"], ["gap against maker", "perp gap against the maker", "--s2"]];
+  $("#rsCaption").textContent = `The resting side of every out-of-sample spot trade (${RS.trades.toLocaleString("en-US")} trades, ${RS.btc.toFixed(0)} BTC), marked against the spot mid h seconds later. Half the spread is worth $0.005 per BTC; one second after the fill the average maker is down ${usd(-at("all", 1).usd_per_btc, 2)} per BTC. Split into thirds by the perp-implied gap just before each trade (cut-offs set on the first half), makers whose side the gap favoured stood at ${usd(at("gap with maker", 1).usd_per_btc, 2)} after one second, and makers it pointed against at ${usd(at("gap against maker", 1).usd_per_btc, 2)}. Bands are ±2 standard errors treating trades as independent, which understates the uncertainty.`;
+  const rsAll = rsNames.flatMap(([g]) => rsH.map(h => [at(g, h).usd_per_btc - 2 * at(g, h).se, at(g, h).usd_per_btc + 2 * at(g, h).se])).flat();
+  plot($("#rsChart"), {
+    height: 260, label: "Realized spread of passive fills by horizon", margin: { l: 56 },
+    x: { domain: [rsH[0], rsH[rsH.length - 1]], log: true, ticks: [0.1, 0.5, 1, 5, 10, 60], fmt: x => x + "s", label: "horizon after the trade" },
+    y: { domain: [Math.min(...rsAll) * 1.08, Math.max(0.5, ...rsAll) * 1.15], fmt: x => "$" + x.toFixed(0), label: "maker PnL, USD per BTC" },
+    draw(gr, X, Y) {
+      el("line", { class: "zero", x1: X(rsH[0]), x2: X(rsH[rsH.length - 1]), y1: Y(0), y2: Y(0) }, gr);
+      rsNames.forEach(([g, , c]) => {
+        const up = rsH.map(h => [h, at(g, h).usd_per_btc + 2 * at(g, h).se]), dn = rsH.map(h => [h, at(g, h).usd_per_btc - 2 * at(g, h).se]).reverse();
+        el("path", { d: pathOf(up, X, Y) + pathOf(dn, X, Y).replace("M", "L") + "Z", fill: `var(${c})`, "fill-opacity": 0.12, stroke: "none" }, gr);
+        el("path", { d: pathOf(rsH.map(h => [h, at(g, h).usd_per_btc]), X, Y), fill: "none", stroke: `var(${c})`, "stroke-width": g === "all" ? 2.6 : 2 }, gr);
+        rsH.forEach(h => el("circle", { cx: X(h), cy: Y(at(g, h).usd_per_btc), r: 2.8, fill: `var(${c})` }, gr));
+      });
+    },
+  });
+  $("#rsLegend").innerHTML = rsNames.map(([g, name, c]) => `<span><i style="background:var(${c})"></i>${name} (${rsG[g].trades.toLocaleString("en-US")})</span>`).join("");
+
+  const g1 = ll.gap_predicts_spot["1.0"];
+  const pos = ll.lags_s.map((l, i) => [l, ll.corr[i]]);
+  const leadSide = pos.filter(p => p[0] > 0).reduce((a, p) => a + p[1], 0), lagSide = pos.filter(p => p[0] < 0).reduce((a, p) => a + p[1], 0);
+  const fd = R.feed_delays;
+  $("#leadCaption").textContent = `Correlation of 50 ms mid changes, perp at t against spot at t + lag. Summed over the non-zero lags, perp-first moves score ${leadSide.toFixed(2)} and spot-first moves ${lagSide.toFixed(2)}: ` +
+    (leadSide > lagSide ? "the perp tends to move first. " : "in this session price discovery ran both ways, with spot slightly ahead. ") +
+    `Timestamps are receive times; the perp feed arrived ${Math.abs(fd.perp_minus_spot_median_ms).toFixed(0)} ms ${fd.perp_minus_spot_median_ms > 0 ? "later" : "earlier"} than spot relative to exchange time, which shifts the picture by about one bar. The perp-implied fair value (perp mid plus a slow average of the basis) still predicts the next second of spot with correlation ${g1.corr.toFixed(2)}; ${(g1.beta * 100).toFixed(0)}% of the gap closes within one second on average.`;
+  const cmax = Math.max(...ll.corr.map(Math.abs)) * 1.15;
+  plot($("#leadChart"), {
+    height: 240, label: "Lead-lag correlation", margin: { l: 46 },
+    x: { domain: [ll.lags_s[0] - 0.05, ll.lags_s[ll.lags_s.length - 1] + 0.05], fmt: x => (x > 0 ? "+" : "") + x + "s", label: "lag (positive: perp moves first)" },
+    y: { domain: [Math.min(0, ...ll.corr) - 0.02, cmax], label: "correlation" },
+    draw(gr, X, Y) {
+      const w = Math.max(1.5, (X(ll.dt_s) - X(0)) * 0.75);
+      pos.forEach(([l, c]) => el("rect", { x: X(l) - w / 2, y: Math.min(Y(c), Y(0)), width: w, height: Math.abs(Y(c) - Y(0)), fill: l > 0 ? "var(--s1)" : l < 0 ? "var(--s2)" : "var(--s3)" }, gr));
+      el("line", { class: "zero", x1: X(ll.lags_s[0]), x2: X(ll.lags_s[ll.lags_s.length - 1]), y1: Y(0), y2: Y(0) }, gr);
+    },
+  });
+
+  const pts = fi.depth.map((d, i) => [d, fi.intensity[i], fi.fills[i]]).filter(p => p[1] > 0 && p[2] >= 5);
+  $("#realCalCaption").textContent = `Probe quotes at random depths up to $3 from the mid, resting at most 2 s, ${LATENCY_LABEL(R)} round trip. The fit gives A = ${fi.A.toFixed(3)} fills/s and κ = ${fi.kappa.toFixed(4)} per tick: the curve is far flatter than in the synthetic market, because with σ ≈ ${(R.model.sigma / 100).toFixed(2)} $/√s against a $0.01 tick most fills come from the price moving onto the quote rather than from market orders reaching into the book.`;
+  if (pts.length) {
+    const ys = pts.map(p => p[1]);
+    plot($("#realCalChart"), {
+      height: 240, label: "Real fill intensity versus depth", margin: { l: 56 },
+      x: { domain: [0, Math.max(...fi.depth) + 12.5], fmt: v => "$" + (v / 100).toFixed(1), label: "depth from mid" },
+      y: { domain: [Math.min(...ys) * 0.6, Math.max(...ys, fi.A) * 1.5], log: true, fmt: v => v >= 0.1 ? v.toFixed(1) : v.toPrecision(1), label: "fills / s" },
+      draw(gr, X, Y) {
+        const line = []; for (let d = 0; d <= Math.max(...fi.depth); d += 5) line.push([d, fi.A * Math.exp(-fi.kappa * d)]);
+        el("path", { d: pathOf(line, X, Y), fill: "none", stroke: "var(--s2)", "stroke-width": 2 }, gr);
+        const mf = Math.max(...pts.map(p => p[2]));
+        pts.forEach(([d, l, n]) => el("circle", { cx: X(d), cy: Y(l), r: 3 + 5 * Math.sqrt(n / mf), fill: "var(--s1)", "fill-opacity": 0.75 }, gr));
+        el("text", { class: "annot", x: X(Math.max(...fi.depth)), y: 22, "text-anchor": "end" }, gr).textContent = `R² = ${fi.r2.toFixed(2)}`;
+      },
+    });
+  }
+
+  const oosMin = (R.split_s.out_of_sample[1] - R.split_s.out_of_sample[0]) / 60;
+  $("#realOosCaption").textContent = `${oosMin.toFixed(0)} out-of-sample minutes, 0.001 BTC quotes, inventory limit 0.01 BTC, ${LATENCY_LABEL(R)} round trip. "Touch" quoters sit a tuned distance from the reference with linear inventory skew; GLFT uses the calibrated closed form. The perp-led reference is the spot mid plus ${Math.round(R.lead_weight * 100)}% of its gap to the perp-implied price, the share of that gap that closed within one second in the first half. Gross PnL is before fees; the net columns charge the maker fee on traded notional.`;
+  const best = C.reduce((a, b) => (b.gross_pnl_per_hour > a.gross_pnl_per_hour ? b : a));
+  $("#realTable").innerHTML = `<thead><tr><th>Strategy</th><th>Gross / h</th><th>± s.e.</th><th>Fills</th><th>BTC traded</th><th>Edge / BTC</th><th>Break-even fee</th><th>Net / h @ 1 bp</th><th>Net / h @ 10 bp</th><th>Markout 1 s</th><th>Markout 10 s</th><th>Mean |q|</th></tr></thead><tbody>` +
+    C.map((c, i) => {
+      const mk = c.markout_usd_per_btc;
+      return `<tr class="${c === best ? "hl" : ""}"><td><span class="sw" style="background:${colorOf(i)}"></span>${c.label}</td><td class="${c.gross_pnl_per_hour >= 0 ? "pos" : "neg"}">${usd(c.gross_pnl_per_hour, 2)}</td><td>${fin(c.gross_pnl_per_hour_se) ? usd(c.gross_pnl_per_hour_se, 2) : "–"}</td><td>${c.fills.toLocaleString("en-US")}</td><td>${c.volume_btc.toFixed(3)}</td><td>${fin(c.gross_edge_per_btc) ? usd(c.gross_edge_per_btc, 2) : "–"}</td><td>${fx(c.breakeven_fee_bps, 3)} bp</td><td>${usd(c.net_pnl_per_hour["1.0"], 2)}</td><td>${usd(c.net_pnl_per_hour["10.0"], 2)}</td><td>${fin(mk["1.0"]) ? usd(mk["1.0"], 2) : "–"}</td><td>${fin(mk["10.0"]) ? usd(mk["10.0"], 2) : "–"}</td><td>${c.inventory_abs_mean_btc.toFixed(4)}</td></tr>`;
+    }).join("") + "</tbody>";
+
+  const hs = Object.keys(C[0].markout_usd_per_btc).map(Number);
+  const mvals = C.flatMap(c => Object.values(c.markout_usd_per_btc)).filter(fin);
+  plot($("#realMarkoutChart"), {
+    height: 240, label: "Markouts on real data", margin: { l: 52 },
+    x: { domain: [hs[0], hs[hs.length - 1]], log: true, ticks: [0.1, 0.5, 1, 5, 10, 60], fmt: x => x + "s", label: "horizon after fill" },
+    y: { domain: [Math.min(0, ...mvals) * 1.1 - 0.5, Math.max(0, ...mvals) * 1.1 + 0.5], fmt: x => "$" + x.toFixed(0), label: "USD per BTC" },
+    draw(gr, X, Y) {
+      el("line", { class: "zero", x1: X(hs[0]), x2: X(hs[hs.length - 1]), y1: Y(0), y2: Y(0) }, gr);
+      C.forEach((c, i) => {
+        const p = hs.map(x => [x, c.markout_usd_per_btc[String(x)] ?? c.markout_usd_per_btc[x.toFixed(1)]]).filter(q => fin(q[1]));
+        el("path", { d: pathOf(p, X, Y), fill: "none", stroke: colorOf(i), "stroke-width": c === best ? 2.6 : 1.6 }, gr);
+        p.forEach(q => el("circle", { cx: X(q[0]), cy: Y(q[1]), r: 2.6, fill: colorOf(i) }, gr));
+      });
+    },
+  });
+  $("#realMarkoutLegend").innerHTML = C.map((c, i) => `<span><i style="background:${colorOf(i)}"></i>${c.label}</span>`).join("");
+
+  const be = C.map(c => c.breakeven_fee_bps).filter(fin);
+  const topBe = be.length ? Math.max(...be) : NaN;
+  $("#feeCaption").textContent = `The maker fee at which each strategy's gross PnL would be exactly zero, in basis points of traded notional. Binance's standard spot fee for a regular account is 0.10% (10 bp) per side. ` +
+    (topBe > 0 ? `The best strategy here breaks even at ${fx(topBe, 3)} bp, about ${Math.round(10 / topBe)} times below that rate, so at retail fees every strategy loses money.`
+               : `None of the strategies makes money even before fees, so no fee level would rescue them.`);
+  const bmax = Math.max(10.5, ...be.map(Math.abs)) * 1.05, bmin = Math.min(0, ...be) * 1.1;
+  plot($("#feeChart"), {
+    height: 40 + C.length * 38, margin: { l: 130, b: 34 }, label: "Break-even maker fee by strategy",
+    x: { domain: [Math.min(bmin, -0.5), bmax], fmt: x => x + " bp", label: "break-even maker fee (bp)" },
+    y: { domain: [0, C.length], ticks: [] },
+    draw(gr, X, Y) {
+      C.forEach((c, i) => {
+        const yc = Y(C.length - i - 0.5), b = fin(c.breakeven_fee_bps) ? c.breakeven_fee_bps : 0;
+        el("text", { class: "axlabel", x: 6, y: yc + 4, style: "fill:var(--ink);font-weight:600" }, gr).textContent = c.label;
+        el("rect", { x: Math.min(X(0), X(b)), y: yc - 9, width: Math.max(1, Math.abs(X(b) - X(0))), height: 18, fill: b >= 0 ? "var(--s3)" : "var(--s2)", rx: 2 }, gr);
+      });
+      for (const [fee, name] of [[1, "1 bp"], [10, "10 bp · Binance regular spot"]]) {
+        el("line", { x1: X(fee), x2: X(fee), y1: Y(0), y2: Y(C.length), stroke: "var(--muted)", "stroke-dasharray": "4 3" }, gr);
+        el("text", { class: "axlabel", x: X(fee) - 4, y: Y(C.length) + 12, "text-anchor": "end" }, gr).textContent = name;
+      }
+      el("line", { class: "zero", x1: X(0), x2: X(0), y1: Y(0), y2: Y(C.length) }, gr);
+    },
+  });
+
+  const L = R.latency;
+  const lv = L.map(r => r.gross_pnl_per_hour);
+  $("#realLatCaption").textContent = `${R.champion} on the out-of-sample half with only the round-trip latency changed, gross of fees. ${L[0].latency_s * 1e3} ms is co-location territory, 200 ms is a home connection to Binance's matching engine.`;
+  plot($("#realLatChart"), {
+    height: 240, label: "Gross PnL versus latency on real data", margin: { l: 58 },
+    x: { domain: [L[0].latency_s * 1e3 * 0.8, L[L.length - 1].latency_s * 1e3 * 1.25], log: true, ticks: [1, 10, 100, 1000], fmt: x => x >= 1000 ? x / 1000 + " s" : x + " ms", label: "round-trip latency" },
+    y: { domain: [Math.min(0, ...lv) * 1.15 - 0.2, Math.max(0, ...lv) * 1.15 + 0.2], fmt: x => usd(x, Math.abs(x) < 10 ? 1 : 0), label: "gross PnL / h" },
+    draw(gr, X, Y) {
+      el("line", { class: "zero", x1: X(L[0].latency_s * 1e3 * 0.8), x2: X(L[L.length - 1].latency_s * 1e3 * 1.25), y1: Y(0), y2: Y(0) }, gr);
+      el("path", { d: pathOf(L.map(r => [r.latency_s * 1e3, r.gross_pnl_per_hour]), X, Y), fill: "none", stroke: "var(--s1)", "stroke-width": 2.2 }, gr);
+      L.forEach(r => el("circle", { cx: X(r.latency_s * 1e3), cy: Y(r.gross_pnl_per_hour), r: 3.6, fill: "var(--s1)" }, gr));
+    },
+  });
+
+  const z = R.trace.zoom, zf = R.trace.zoom_fills;
+  const t0 = z.t[0];
+  const zv = [...z.mid, ...z.lead, ...z.bid, ...z.ask].filter(x => x != null);
+  $("#realTraceCaption").textContent = `${R.champion}, 90 seconds of the out-of-sample replay around its sharpest one-second move ($${R.trace.zoom_move_usd.toFixed(2)}). Prices in USD.`;
+  plot($("#realTraceChart"), {
+    height: 250, label: "Replay trace on real data", margin: { l: 70 },
+    x: { domain: [0, z.t[z.t.length - 1] - t0], fmt: x => x.toFixed(0) + "s", label: "seconds" },
+    y: { domain: [Math.min(...zv) / 100 - 0.5, Math.max(...zv) / 100 + 0.5], fmt: x => x.toFixed(1) },
+    draw(gr, X, Y) {
+      const ts = z.t.map(t => t - t0), sc = a => a.map(x => x == null ? null : x / 100);
+      el("path", { d: stepPath(ts, sc(z.bid), X, Y), fill: "none", stroke: "var(--bid)", "stroke-width": 1.8 }, gr);
+      el("path", { d: stepPath(ts, sc(z.ask), X, Y), fill: "none", stroke: "var(--ask)", "stroke-width": 1.8 }, gr);
+      el("path", { d: pathOf(ts.map((t, i) => [t, z.lead[i] == null ? null : z.lead[i] / 100]), X, Y), fill: "none", stroke: "var(--s5)", "stroke-width": 1.2 }, gr);
+      el("path", { d: pathOf(ts.map((t, i) => [t, z.mid[i] == null ? null : z.mid[i] / 100]), X, Y), fill: "none", stroke: "var(--ink)", "stroke-width": 1.4 }, gr);
+      for (const [t, side, px] of zf) {
+        const x = X(t - t0), y = Y(px / 100);
+        el("path", { d: side > 0 ? `M${x},${y - 6}l5,9h-10z` : `M${x},${y + 6}l5,-9h-10z`, fill: side > 0 ? "var(--bid)" : "var(--ask)" }, gr);
+      }
+    },
+  });
+})();
+(function realFacts() {
+  const R = DATA.real;
+  if (!R) return;
+  const C = R.comparison, RS = R.realized_spreads;
+  const rs1 = g => (RS[g].groups["all"].markout["1.0"]).usd_per_btc;
+  const sep = w => RS[w].groups["gap with maker"].markout["1.0"].usd_per_btc - RS[w].groups["gap against maker"].markout["1.0"].usd_per_btc;
+  const edges = C.map(c => c.gross_edge_per_btc).filter(x => isFinite(x));
+  const price = R.stats.full.price_usd, L = R.latency;
+  const si = R.stats.in_sample.sigma_ticks_per_sqrt_s, so = R.stats.out_of_sample.sigma_ticks_per_sqrt_s;
+  $("#realFacts").innerHTML = [
+    [usd(rs1("out_of_sample"), 2) + " / BTC", `What the resting side of an out-of-sample trade was worth one second later, about ${Math.round(Math.abs(rs1("out_of_sample")) / 0.005).toLocaleString("en-US")} times the half-spread it earned. On this market a resting order mostly fills when the price is about to move through it.`],
+    [`${usd(Math.min(...edges), 2)} to ${usd(Math.max(...edges), 2)}`, `Gross result per BTC traded for every strategy tested out of sample, before fees. A 10 bp maker fee costs a further ${usd(price * 1e-3, 0)} per BTC, so fees, not cleverness, set the outcome for a retail account.`],
+    [`${sep("in_sample") > 0 ? "$" + sep("in_sample").toFixed(1) : "–"} → ${"$" + sep("out_of_sample").toFixed(1)}`, `How far the perp signal separated good fills from bad ones (per BTC, at 1 s), first half against second half. The second half was ${(so / si).toFixed(1)}× as volatile and the in-sample edge of the signal shrank accordingly: it did not survive out of sample here.`],
+  ].map(([b, p]) => `<div class="fact"><b>${b}</b><p>${p}</p></div>`).join("") +
+  `<div class="fact"><b>${(L[L.length - 1].gross_pnl_per_hour / L[0].gross_pnl_per_hour).toFixed(1)}×</b><p>Growth of the hourly loss from ${L[0].latency_s * 1e3} ms to ${L[L.length - 1].latency_s} s round trip. Speed does not make a losing quote profitable, but every millisecond of delay makes it lose more.</p></div>` +
+  `<div class="fact"><b>${R.feed_delays.spot.median_ms.toFixed(0)} ms</b><p>Median gap between Binance's trade timestamp and its arrival on this machine (network delay plus clock offset). A co-located firm sees the same trade within microseconds.</p></div>` +
+  `<div class="fact"><b>${R.validation.audit_near_touch_mismatched} / ${R.validation.audit_near_touch_levels.toLocaleString("en-US")}</b><p>Rebuilt book levels near the touch that disagreed with Binance's own audit snapshots, over ${R.validation.audits_comparable} audits and ${R.validation.sequence_gaps} sequence gaps.</p></div>`;
+})();
+(function paper() {
+  const P = DATA.paper || [];
+  if (!P.length) { $("#paperCard").hidden = true; return; }
+  const all = P.every(x => x.replay_reproduces_live && x.replay_matches_backtest);
+  $("#paperCaption").textContent = `The same market maker running on Binance's live streams with virtual orders: the book is rebuilt in real time, quotes queue behind real liquidity and fill only when real trades reach them. No order is sent. Each session recorded its own messages; replaying the recording offline ${all ? "reproduced the live result exactly and matched the array backtest, fill for fill" : "was checked against the live result"}.`;
+  $("#paperTable").innerHTML = `<thead><tr><th>Session</th><th>Minutes</th><th>Fills</th><th>BTC</th><th>Gross</th><th>Net @ 10 bp</th><th>Edge / BTC</th><th>Markout 1 s</th><th>Replay = live</th></tr></thead><tbody>` +
+    P.map(x => `<tr><td>${x.label}</td><td>${x.minutes.toFixed(1)}</td><td>${x.fills}</td><td>${x.volume_btc.toFixed(3)}</td><td class="${x.gross_usd >= 0 ? "pos" : "neg"}">${usd(x.gross_usd, 2)}</td><td class="neg">${usd(x.net10_usd, 2)}</td><td>${isFinite(x.edge_per_btc) && x.fills ? usd(x.edge_per_btc, 2) : "–"}</td><td>${isFinite(x.markout_1s) && x.fills ? usd(x.markout_1s, 2) : "–"}</td><td>${x.replay_reproduces_live && x.replay_matches_backtest ? '<span class="pos">✓ exact</span>' : "–"}</td></tr>`).join("") + "</tbody>";
+})();
+function LATENCY_LABEL(R) { const s = R.comparison[0].config.latency_s; return s < 1 ? (s * 1e3).toFixed(0) + " ms" : s + " s"; }
+
+// ================================================================ live market simulator
+// A compact port of meridian_research.market: same agents, same GLFT quoting, smaller book code.
+const BUY = 0, SELL = 1;
+function makeRng(seed) {
+  let s = seed >>> 0;
+  return () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+class Heap {
+  constructor() { this.a = []; }
+  get size() { return this.a.length; }
+  less(x, y) { return x.t < y.t || (x.t === y.t && x.seq < y.seq); }
+  push(x) { const a = this.a; a.push(x); let i = a.length - 1; while (i > 0) { const p = (i - 1) >> 1; if (this.less(a[i], a[p])) { [a[i], a[p]] = [a[p], a[i]]; i = p; } else break; } }
+  pop() {
+    const a = this.a, top = a[0], last = a.pop();
+    if (a.length) { a[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < a.length && this.less(a[l], a[m])) m = l; if (r < a.length && this.less(a[r], a[m])) m = r; if (m === i) break; [a[i], a[m]] = [a[m], a[i]]; i = m; } }
+    return top;
+  }
+  peek() { return this.a[0]; }
+}
+class Book {
+  constructor() { this.px = [[], []]; this.lv = [new Map(), new Map()]; this.orders = new Map(); }
+  best(s) { return this.px[s].length ? this.px[s][0] : null; }
+  qty(s, p) { const l = this.lv[s].get(p); return l ? l.qty : 0; }
+  addPx(s, p) { const a = this.px[s]; let lo = 0, hi = a.length; while (lo < hi) { const m = (lo + hi) >> 1; if (s === BUY ? a[m] > p : a[m] < p) lo = m + 1; else hi = m; } a.splice(lo, 0, p); }
+  dropPx(s, p) { const a = this.px[s], i = a.indexOf(p); if (i >= 0) a.splice(i, 1); }
+  submit(owner, id, s, price, qty, o = {}) {
+    const opp = 1 - s, limit = o.market ? (s === BUY ? Infinity : -Infinity) : price;
+    if (o.postOnly) { const b = this.best(opp); if (b !== null && (s === BUY ? limit >= b : limit <= b)) return null; }
+    const fills = []; let left = qty;
+    while (left > 0) {
+      const p = this.best(opp);
+      if (p === null || (s === BUY ? p > limit : p < limit)) break;
+      const l = this.lv[opp].get(p);
+      while (left > 0 && l.q.length) {
+        const m = l.q[0];
+        if (!m.alive) { l.q.shift(); continue; }
+        const x = Math.min(left, m.leaves);
+        m.leaves -= x; left -= x; l.qty -= x;
+        fills.push({ owner: m.owner, id: m.id, price: p, qty: x, leaves: m.leaves });
+        if (m.leaves === 0) { m.alive = false; l.q.shift(); this.orders.delete(m.id); }
+      }
+      if (l.qty === 0) { this.lv[opp].delete(p); this.dropPx(opp, p); }
+    }
+    if (left > 0 && !o.ioc && !o.market) {
+      let l = this.lv[s].get(price);
+      if (!l) { l = { qty: 0, q: [] }; this.lv[s].set(price, l); this.addPx(s, price); }
+      const ord = { id, owner, side: s, price, leaves: left, alive: true };
+      l.q.push(ord); l.qty += left; this.orders.set(id, ord);
+    }
+    return { fills, left };
+  }
+  cancel(id) {
+    const o = this.orders.get(id); if (!o) return 0;
+    this.orders.delete(id); o.alive = false;
+    const l = this.lv[o.side].get(o.price); l.qty -= o.leaves;
+    if (l.qty === 0) { this.lv[o.side].delete(o.price); this.dropPx(o.side, o.price); }
+    return o.leaves;
+  }
+  leaves(id) { const o = this.orders.get(id); return o ? o.leaves : 0; }
+  topExcluding(s, ownId) {
+    const p = this.best(s); if (p === null) return [null, 0];
+    const q = this.qty(s, p), o = ownId != null ? this.orders.get(ownId) : null;
+    if (!o || o.price !== p) return [p, q];
+    if (q > o.leaves) return [p, q - o.leaves];
+    const p2 = this.px[s].length > 1 ? this.px[s][1] : null;
+    return p2 === null ? [null, 0] : [p2, this.qty(s, p2)];
+  }
+}
+
+const MK = STUDY.market, CAL = STUDY.calibration;
+const MM = 1, LP = 2, NOISE = 3, ARB = 4, INF = 5;
+const E = { LP: 0, LPC: 1, NOISE: 2, ARB: 3, INF: 4, DECIDE: 5, APPLY: 6, SAMPLE: 7, JUMP: 8 };
+class Market {
+  constructor(seed, params) { this.seed = seed; this.p = params; this.reset(); }
+  reset() {
+    const m = MK;
+    this.r = makeRng(this.seed);
+    this.book = new Book(); this.ev = new Heap(); this.seq = 0; this.cl = 0; this.t = 0;
+    this.dt = 0.01; this.path = [m.v0]; this.V = m.v0;
+    this.q = 0; this.cash = 0; this.reb = 0; this.mm = [null, null]; this.pending = false; this.lastRef = null; this.nextTimer = 0;
+    this.lots = 0; this.edge = 0; this.mkSum = 0; this.mkLots = 0; this.fills = []; this.pendingMk = [];
+    this.hist = []; this.slow = []; this.lastSlow = -1;
+    this.ex = [0, 0]; this.exT = 0;
+    for (let d = 0; d < 6; d++) for (const s of [BUY, SELL]) for (let k = 0; k < 2; k++) {
+      const px = s === BUY ? Math.ceil(this.V) - 1 - d : Math.floor(this.V) + 1 + d, id = ++this.cl;
+      this.book.submit(LP, id, s, px, 1 + this.geo(m.lp_size_p));
+      this.push(this.expo(1 / m.lp_lifetime_s), E.LPC, id);
+    }
+    this.push(this.expo(m.lp_rate), E.LP); this.push(this.expo(m.arb_rate), E.ARB);
+    this.push(this.expo(m.informed_rate * this.p.informed), E.INF); this.push(this.noiseNext(0), E.NOISE);
+    this.push(0, E.SAMPLE); this.push(0.5, E.DECIDE); this.pending = true;
+  }
+  u() { return this.r(); }
+  expo(rate) { return -Math.log(1 - this.u()) / rate; }
+  geo(p) { return Math.floor(Math.log(1 - this.u()) / Math.log1p(-p)); }
+  gauss() { const u = 1 - this.u(), v = this.u(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+  push(t, kind, payload) { this.ev.push({ t, seq: ++this.seq, kind, payload }); }
+  // Fair value on a 10 ms grid, generated ahead so informed traders can look 10 s into the future.
+  vAt(t) {
+    const i = Math.floor(t / this.dt), m = MK, vol = this.p.vol;
+    while (this.path.length <= i) {
+      let v = this.path[this.path.length - 1] + m.sigma * vol * Math.sqrt(this.dt) * this.gauss();
+      if (this.u() < m.jump_rate * this.dt) v += (this.u() < 0.5 ? -1 : 1) * this.expo(1 / (m.jump_mean_abs * vol));
+      this.path.push(v);
+    }
+    return this.path[i];
+  }
+  news(ticks) { const i = Math.floor(this.t / this.dt) + 1; this.vAt(this.t + MK.informed_horizon_s + 1); for (let k = i; k < this.path.length; k++) this.path[k] += ticks; }
+  // Ogata thinning: the candidate is drawn with the intensity bound at scheduling time (excitation only decays after).
+  noiseNext(t) { this.noiseBound = 2 * MK.noise_mu + this.ex[0] + this.ex[1]; return t + this.expo(this.noiseBound); }
+  mid() { const b = this.book.best(BUY), a = this.book.best(SELL); return b === null || a === null ? null : (b + a) / 2; }
+  view() {
+    const own = this.mm, [bb, bq] = this.book.topExcluding(BUY, own[BUY] && own[BUY].id), [ba, aq] = this.book.topExcluding(SELL, own[SELL] && own[SELL].id);
+    return { bb, ba, bq, aq };
+  }
+  ref(v) {
+    const mode = this.p.ref;
+    if (mode === "lead") return this.V;
+    const { bb, ba, bq, aq } = v;
+    if (bb === null && ba === null) return null;
+    if (bb === null) return ba - 0.5;
+    if (ba === null) return bb + 0.5;
+    if (mode === "mid" || bq + aq === 0) return (bb + ba) / 2;
+    return (bb * aq + ba * bq) / (bq + aq);
+  }
+  glft() {
+    const g = this.p.gamma, k = CAL.kappa, A = CAL.A, s = CAL.sigma * this.p.vol;
+    const c1 = Math.log1p(g / k) / g, c2 = Math.sqrt(s * s * g / (2 * k * A) * Math.pow(1 + g / k, 1 + k / g));
+    return [c1, c2];
+  }
+  decide(t) {
+    this.pending = false; this.nextTimer = t + 1.0;
+    const v = this.view(), s = this.ref(v); this.lastRef = s;
+    let quote = null;
+    if (s !== null) {
+      const [c1, c2] = this.glft(), size = 2, maxInv = 50, qn = this.q / size;
+      let b = this.q < maxInv ? Math.floor(s - (c1 + (2 * qn + 1) / 2 * c2)) : null;
+      let a = this.q > -maxInv ? Math.ceil(s + (c1 - (2 * qn - 1) / 2 * c2)) : null;
+      if (b !== null && v.ba !== null) b = Math.min(b, v.ba - 1);
+      if (a !== null && v.bb !== null) a = Math.max(a, v.bb + 1);
+      if (b !== null && a !== null && a <= b) a = b + 1;
+      quote = { bid: b, ask: a, size };
+    }
+    this.push(t + this.p.latency, E.APPLY, quote);
+  }
+  apply(t, quote) {
+    const tg = quote ? [quote.bid, quote.ask] : [null, null], place = [];
+    for (const s of [BUY, SELL]) {
+      let cur = this.mm[s];
+      if (cur && this.book.leaves(cur.id) === 0) cur = this.mm[s] = null;
+      if (cur && tg[s] === cur.price) continue;
+      if (cur) { this.book.cancel(cur.id); this.mm[s] = null; }
+      place.push(s);
+    }
+    for (const s of place) {
+      if (tg[s] === null) continue;
+      const id = ++this.cl, r = this.book.submit(MM, id, s, tg[s], quote.size, { postOnly: true });
+      if (r) this.mm[s] = { id, price: tg[s] };
+    }
+  }
+  onFills(fills, makerSide, t, midPre) {
+    let hit = false;
+    for (const x of fills) {
+      if (x.owner !== MM) continue;
+      hit = true;
+      const sg = makerSide === BUY ? 1 : -1;
+      this.q += sg * x.qty; this.cash -= sg * x.price * x.qty; this.reb += MK.maker_rebate * x.qty; this.lots += x.qty;
+      if (midPre !== null) this.edge += sg * (midPre - x.price) * x.qty;
+      this.fills.push({ t, sg, price: x.price }); this.pendingMk.push({ t, sg, price: x.price, qty: x.qty });
+      if (x.leaves === 0 && this.mm[makerSide] && this.mm[makerSide].id === x.id) this.mm[makerSide] = null;
+    }
+    if (hit && !this.pending) { this.pending = true; this.push(t, E.DECIDE); }
+  }
+  take(owner, s, price, qty, t, market) {
+    const midPre = this.mid(), r = this.book.submit(owner, ++this.cl, s, price, qty, { ioc: true, market });
+    if (r && r.fills.length) this.onFills(r.fills, 1 - s, t, midPre);
+  }
+  sample(t) {
+    const b = this.book.best(BUY), a = this.book.best(SELL), mid = this.mid();
+    const pnl = this.cash + this.q * (mid ?? this.V) + this.reb;
+    this.hist.push({ t, V: this.V, b, a, mb: this.mm[BUY] && this.mm[BUY].price, ma: this.mm[SELL] && this.mm[SELL].price });
+    if (this.hist.length > 900) this.hist.splice(0, this.hist.length - 700);
+    if (Math.floor(t) !== this.lastSlow) { this.lastSlow = Math.floor(t); this.slow.push({ t, q: this.q, pnl }); if (this.slow.length > 700) this.slow.splice(0, 100); }
+    while (this.pendingMk.length && this.pendingMk[0].t + 10 <= t) {
+      const x = this.pendingMk.shift(); this.mkSum += x.sg * (this.vAt(x.t + 10) - x.price) * x.qty; this.mkLots += x.qty;
+    }
+    if (this.fills.length > 400) this.fills.splice(0, 200);
+    this.pnl = pnl;
+  }
+  advance(until) {
+    const m = MK, bk = this.book;
+    while (this.ev.size && this.ev.peek().t < until) {
+      const { t, kind, payload } = this.ev.pop();
+      this.t = t; this.V = this.vAt(t);
+      switch (kind) {
+        case E.LP: {
+          const s = this.u() < 0.5 ? BUY : SELL, d = this.geo(m.lp_depth_p);
+          const px = s === BUY ? Math.ceil(this.V) - 1 - d : Math.floor(this.V) + 1 + d, id = ++this.cl, midPre = this.mid();
+          const r = bk.submit(LP, id, s, px, 1 + this.geo(m.lp_size_p));
+          if (r.fills.length) this.onFills(r.fills, 1 - s, t, midPre);
+          if (r.left > 0) this.push(t + this.expo(1 / m.lp_lifetime_s), E.LPC, id);
+          this.push(t + this.expo(m.lp_rate), E.LP); break;
+        }
+        case E.LPC: bk.cancel(payload); break;
+        case E.NOISE: {
+          const decay = Math.exp(-m.noise_beta * (t - this.exT)); this.ex[0] *= decay; this.ex[1] *= decay; this.exT = t;
+          const l0 = m.noise_mu + this.ex[0], l1 = m.noise_mu + this.ex[1];
+          const u = this.u() * this.noiseBound;
+          if (u < l0 + l1) {
+            const s = u < l0 ? BUY : SELL;
+            this.take(NOISE, s, 0, 1 + this.geo(m.noise_size_p), t, true);
+            this.ex[s] += m.noise_alpha_self; this.ex[1 - s] += m.noise_alpha_cross;
+          }
+          this.push(this.noiseNext(t), E.NOISE); break;
+        }
+        case E.ARB: {
+          const a = bk.best(SELL), b = bk.best(BUY);
+          if (a !== null && a <= this.V - m.arb_edge) this.take(ARB, BUY, Math.floor(this.V - m.arb_edge), m.arb_max_lots, t, false);
+          else if (b !== null && b >= this.V + m.arb_edge) this.take(ARB, SELL, Math.ceil(this.V + m.arb_edge), m.arb_max_lots, t, false);
+          this.push(t + this.expo(m.arb_rate), E.ARB); break;
+        }
+        case E.INF: {
+          const fut = this.vAt(t + m.informed_horizon_s), a = bk.best(SELL), b = bk.best(BUY), size = 1 + this.geo(m.informed_size_p);
+          if (a !== null && fut - a >= m.informed_edge) this.take(INF, BUY, 0, size, t, true);
+          else if (b !== null && b - fut >= m.informed_edge) this.take(INF, SELL, 0, size, t, true);
+          this.push(t + this.expo(m.informed_rate * Math.max(this.p.informed, 0.01)), E.INF); break;
+        }
+        case E.DECIDE: this.decide(t); break;
+        case E.APPLY: this.apply(t, payload); break;
+        case E.SAMPLE: this.sample(t); this.push(t + 0.1, E.SAMPLE); break;
+      }
+      if (!this.pending && t >= 0.5) {
+        let go = t >= this.nextTimer;
+        if (!go) { const r = this.p.ref === "lead" ? this.V : this.ref(this.view()); go = r !== null && (this.lastRef === null || Math.abs(r - this.lastRef) >= 0.35); }
+        if (go) { this.pending = true; this.push(t, E.DECIDE); }
+      }
+    }
+    this.t = until;
+  }
+}
+
+// ---------------------------------------------------------------- simulator UI
+(function simulator() {
+  const params = { gamma: STUDY.glft.gamma, latency: STUDY.maker.latency_s, ref: "lead", informed: 1, vol: 1 };
+  let sim = new Market(20261023, params), speed = 4, running = true, last = performance.now(), lastLadder = 0;
+  const gIn = $("#gamma"), lIn = $("#latency"), iIn = $("#informed"), vIn = $("#vol");
+  gIn.value = Math.log10(params.gamma); lIn.value = Math.log10(params.latency * 1e3);
+  const sync = () => {
+    params.gamma = 10 ** +gIn.value; params.latency = 10 ** +lIn.value / 1e3; params.informed = +iIn.value; params.vol = +vIn.value;
+    $("#gammaOut").textContent = params.gamma < 0.01 ? params.gamma.toFixed(4) : params.gamma.toFixed(3);
+    $("#latencyOut").textContent = fLat(params.latency);
+    $("#informedOut").textContent = params.informed.toFixed(2) + "×";
+    $("#volOut").textContent = params.vol.toFixed(2) + "×";
+    const [c1, c2] = sim.glft();
+    $("#simNote").textContent = `Quote model: GLFT with A = ${CAL.A.toFixed(2)}/s and κ = ${CAL.kappa.toFixed(2)}/tick from the calibration, σ = ${(CAL.sigma * params.vol).toFixed(2)} ticks/√s. At this γ the flat half-spread is ${(c1 + c2 / 2).toFixed(2)} ticks and each 2-lot unit of inventory shifts both quotes by ${c2.toFixed(2)} ticks. Quote size 2 lots, inventory limit 50 lots, $1 per tick per lot ($0.01 × 100 shares).`;
+  };
+  [gIn, lIn, iIn, vIn].forEach(n => n.addEventListener("input", sync));
+  sync();
+  const segs = (id, attr, onPick) => $(id).addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    for (const x of $(id).querySelectorAll("button")) x.setAttribute("aria-pressed", String(x === b));
+    onPick(b.dataset[attr]);
+  });
+  segs("#refSeg", "ref", v => { params.ref = v; });
+  segs("#speedSeg", "speed", v => { speed = +v; });
+  $("#playBtn").addEventListener("click", () => { running = !running; $("#playBtn").textContent = running ? "Pause" : "Play"; last = performance.now(); });
+  $("#resetBtn").addEventListener("click", () => { sim = new Market(20261023, params); });
+  $("#newsUp").addEventListener("click", () => sim.news(8));
+  $("#newsDown").addEventListener("click", () => sim.news(-8));
+
+  const pc = $("#priceCanvas"), ic = $("#invCanvas");
+  const fit = c => { const r = c.getBoundingClientRect(), d = window.devicePixelRatio || 1; if (c.width !== Math.round(r.width * d)) { c.width = Math.round(r.width * d); c.height = Math.round(r.height * d); } return [c.getContext("2d"), r.width, r.height, d]; };
+
+  function drawPrice() {
+    const [ctx, W, H, d] = fit(pc); ctx.setTransform(d, 0, 0, d, 0, 0); ctx.clearRect(0, 0, W, H);
+    const hs = sim.hist; if (hs.length < 2) return;
+    const tN = sim.t, t0 = tN - 60, pr = 46, X = t => (t - t0) / 60 * (W - pr - 4);
+    const vis = hs.filter(h => h.t >= t0 - 0.2);
+    let lo = Infinity, hi = -Infinity;
+    for (const h of vis) for (const v of [h.V, h.b, h.a, h.mb, h.ma]) if (v != null) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+    const pad = Math.max(2, (hi - lo) * 0.12); lo -= pad; hi += pad; if (hi - lo < 10) { const c = (hi + lo) / 2; lo = c - 5; hi = c + 5; }
+    const Y = v => 8 + (hi - v) / (hi - lo) * (H - 28);
+    const step = Math.max(1, Math.ceil((hi - lo) / 8));
+    ctx.font = `11px ${THEME.mono}`; ctx.textBaseline = "middle";
+    for (let p = Math.ceil(lo / step) * step; p <= hi; p += step) {
+      ctx.strokeStyle = THEME["--rule"]; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, Y(p)); ctx.lineTo(W - pr, Y(p)); ctx.stroke();
+      ctx.fillStyle = THEME["--muted"]; ctx.fillText((p / 100).toFixed(2), W - pr + 4, Y(p));
+    }
+    ctx.fillStyle = THEME["--muted"]; ctx.textBaseline = "alphabetic";
+    for (const s of [60, 45, 30, 15]) ctx.fillText(`−${s}s`, X(tN - s) + 2, H - 4);
+    // spread band
+    ctx.fillStyle = THEME["--rule"];
+    for (let i = 0; i + 1 < vis.length; i++) { const h = vis[i]; if (h.b == null || h.a == null) continue; ctx.fillRect(X(h.t), Y(h.a), X(vis[i + 1].t) - X(h.t) + 0.5, Y(h.b) - Y(h.a)); }
+    const stepLine = (key, color, w) => {
+      ctx.strokeStyle = color; ctx.lineWidth = w; ctx.beginPath(); let open = false;
+      for (let i = 0; i < vis.length; i++) { const v = vis[i][key]; if (v == null) { open = false; continue; } const x = X(vis[i].t), y = Y(v); if (open) { ctx.lineTo(x, ctx._py); ctx.lineTo(x, y); } else ctx.moveTo(x, y); ctx._py = y; open = true; }
+      ctx.stroke();
+    };
+    stepLine("mb", THEME["--bid"], 2); stepLine("ma", THEME["--ask"], 2);
+    ctx.strokeStyle = THEME["--ink"]; ctx.lineWidth = 1.4; ctx.beginPath();
+    vis.forEach((h, i) => (i ? ctx.lineTo(X(h.t), Y(h.V)) : ctx.moveTo(X(h.t), Y(h.V)))); ctx.stroke();
+    for (const fl of sim.fills) {
+      if (fl.t < t0) continue;
+      const x = X(fl.t), y = Y(fl.price); ctx.fillStyle = fl.sg > 0 ? THEME["--bid"] : THEME["--ask"]; ctx.beginPath();
+      if (fl.sg > 0) { ctx.moveTo(x, y - 7); ctx.lineTo(x + 5, y + 2); ctx.lineTo(x - 5, y + 2); } else { ctx.moveTo(x, y + 7); ctx.lineTo(x + 5, y - 2); ctx.lineTo(x - 5, y - 2); }
+      ctx.fill();
+    }
+  }
+  function drawInv() {
+    const [ctx, W, H, d] = fit(ic); ctx.setTransform(d, 0, 0, d, 0, 0); ctx.clearRect(0, 0, W, H);
+    const s = sim.slow.filter(x => x.t >= sim.t - 600); if (s.length < 2) return;
+    const t0 = sim.t - 600, X = t => (t - t0) / 600 * W;
+    const qm = Math.max(10, ...s.map(x => Math.abs(x.q))), Yq = q => H / 2 - q / qm * (H / 2 - 6);
+    ctx.strokeStyle = THEME["--rule"]; ctx.beginPath(); ctx.moveTo(0, H / 2); ctx.lineTo(W, H / 2); ctx.stroke();
+    ctx.fillStyle = THEME["--bid-soft"]; ctx.beginPath(); ctx.moveTo(X(s[0].t), H / 2);
+    s.forEach(x => ctx.lineTo(X(x.t), Yq(x.q))); ctx.lineTo(X(s[s.length - 1].t), H / 2); ctx.fill();
+    ctx.strokeStyle = THEME["--s3"]; ctx.lineWidth = 1.2; ctx.beginPath(); s.forEach((x, i) => (i ? ctx.lineTo(X(x.t), Yq(x.q)) : ctx.moveTo(X(x.t), Yq(x.q)))); ctx.stroke();
+    const pl = s.map(x => x.pnl), plo = Math.min(0, ...pl), phi = Math.max(1, ...pl), Yp = v => H - 6 - (v - plo) / (phi - plo) * (H - 12);
+    ctx.strokeStyle = THEME["--accent"]; ctx.lineWidth = 2; ctx.beginPath(); s.forEach((x, i) => (i ? ctx.lineTo(X(x.t), Yp(x.pnl)) : ctx.moveTo(X(x.t), Yp(x.pnl)))); ctx.stroke();
+    ctx.font = `11px ${THEME.mono}`; ctx.fillStyle = THEME["--muted"]; ctx.fillText(`±${qm} lots`, 4, 12);
+  }
+  function drawLadder() {
+    const V = sim.V, c = Math.round(V), rows = [];
+    let maxQ = 1; for (let p = c - 9; p <= c + 9; p++) maxQ = Math.max(maxQ, sim.book.qty(BUY, p), sim.book.qty(SELL, p));
+    rows.push(`<div class="hdr"><span style="text-align:right">bids</span><span style="text-align:center">price</span><span>asks</span></div>`);
+    for (let p = c + 9; p >= c - 9; p--) {
+      const bq = sim.book.qty(BUY, p), aq = sim.book.qty(SELL, p), mb = sim.mm[BUY] && sim.mm[BUY].price === p, ma = sim.mm[SELL] && sim.mm[SELL].price === p;
+      const fair = Math.round(V) === p;
+      rows.push(`<div class="row${fair ? " fair" : ""}"><div class="cell b">${bq ? `<div class="bar" style="width:${(bq / maxQ * 100).toFixed(0)}%"></div>` : ""}${mb ? `<span class="mm">MM</span>` : ""}<span class="q">${bq || ""}</span></div><div class="px">${(p / 100).toFixed(2)}${fair ? " ◂" : ""}</div><div class="cell a">${aq ? `<div class="bar" style="width:${(aq / maxQ * 100).toFixed(0)}%"></div>` : ""}<span class="q">${aq || ""}</span>${ma ? `<span class="mm">MM</span>` : ""}</div></div>`);
+    }
+    $("#ladder").innerHTML = rows.join("");
+  }
+  function drawTiles() {
+    const pnl = sim.pnl ?? 0;
+    $("#tPnl").textContent = usd(pnl); $("#tPnl").className = pnl >= 0 ? "pos" : "neg";
+    $("#tInv").textContent = (sim.q > 0 ? "+" : "") + sim.q + " lots";
+    $("#tFills").textContent = sim.lots.toLocaleString("en-US") + " lots";
+    $("#tEdge").textContent = sim.lots ? f(sim.edge / sim.lots) + " t" : "–";
+    const mk = sim.mkLots ? sim.mkSum / sim.mkLots : null;
+    $("#tMark").textContent = mk == null ? "–" : f(mk) + " t"; $("#tMark").className = mk == null ? "" : mk >= 0 ? "pos" : "neg";
+    const s = Math.floor(sim.t); $("#tClock").textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  }
+  function frame(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    if (running && !document.hidden) {
+      sim.advance(sim.t + dt * speed);
+      if (sim.t > 7200) sim = new Market(20261023 + Math.floor(sim.t), params);
+    }
+    drawPrice(); drawInv();
+    if (now - lastLadder > 120) { drawLadder(); drawTiles(); lastLadder = now; }
+    requestAnimationFrame(frame);
+  }
+  // Warm the market up so the first frame already shows a populated book and history.
+  sim.advance(75);
+  drawLadder(); drawTiles();
+  requestAnimationFrame(frame);
+})();
+
+// Re-read theme tokens when the viewer's theme changes (canvas colors are not CSS-driven).
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", readTheme);
+new MutationObserver(readTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
